@@ -10,6 +10,65 @@ const Key _hostKey = Key('host');
 const Size _collapsedSize = Size(100, 40);
 const Size _expandedSize = Size(220, 260);
 
+class _ShowcaseSceneSpec {
+  const _ShowcaseSceneSpec({
+    required this.title,
+    required this.toggleKey,
+    required this.backdropKey,
+    required this.dismissDelta,
+  });
+
+  final String title;
+  final Key toggleKey;
+  final Key backdropKey;
+  final Offset dismissDelta;
+}
+
+const _showcaseScenes = <_ShowcaseSceneSpec>[
+  _ShowcaseSceneSpec(
+    title: 'فلتر الطلبات',
+    toggleKey: Key('orders_filter_toggle'),
+    backdropKey: Key('orders_filter_backdrop'),
+    dismissDelta: Offset(-220, 0),
+  ),
+  _ShowcaseSceneSpec(
+    title: 'اقتراحات البحث',
+    toggleKey: Key('search_suggestions_toggle'),
+    backdropKey: Key('search_suggestions_backdrop'),
+    dismissDelta: Offset(0, 180),
+  ),
+  _ShowcaseSceneSpec(
+    title: 'إجراءات التذكرة',
+    toggleKey: Key('ticket_actions_toggle'),
+    backdropKey: Key('ticket_actions_backdrop'),
+    dismissDelta: Offset(-220, -110),
+  ),
+  _ShowcaseSceneSpec(
+    title: 'إنشاء حجز سريع',
+    toggleKey: Key('booking_slot_toggle'),
+    backdropKey: Key('booking_slot_backdrop'),
+    dismissDelta: Offset(-180, -120),
+  ),
+  _ShowcaseSceneSpec(
+    title: 'إعدادات موسعة',
+    toggleKey: Key('settings_inline_toggle'),
+    backdropKey: Key('settings_inline_backdrop'),
+    dismissDelta: Offset(0, 190),
+  ),
+  _ShowcaseSceneSpec(
+    title: 'مؤلف الرسائل',
+    toggleKey: Key('message_composer_toggle'),
+    backdropKey: Key('message_composer_backdrop'),
+    dismissDelta: Offset(0, -170),
+  ),
+  _ShowcaseSceneSpec(
+    title: 'ملخص الدفع',
+    toggleKey: Key('checkout_summary_toggle'),
+    backdropKey: Key('checkout_summary_backdrop'),
+    dismissDelta: Offset(0, -220),
+  ),
+];
+
 void main() {
   testWidgets('App shows the spring surface playground', (
     WidgetTester tester,
@@ -31,25 +90,44 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.byType(SpringSurfaceTestLabPage), findsOneWidget);
-    expect(find.text('فلاتر من الأعلى'), findsOneWidget);
+    expect(find.text(_showcaseScenes.first.title), findsWidgets);
 
-    await tester.scrollUntilVisible(
-      find.text('إجراء من الوسط'),
-      180,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
-    expect(find.text('إجراء من الوسط'), findsOneWidget);
-
-    await tester.scrollUntilVisible(
-      find.text('ملخص من الأسفل'),
-      180,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
-    expect(find.text('ملخص من الأسفل'), findsOneWidget);
+    for (final scene in _showcaseScenes.skip(1)) {
+      await _dragPageUntilVisible(tester, find.text(scene.title));
+      expect(find.text(scene.title), findsWidgets);
+    }
     expect(find.text('قائمة التحقق اليدوية'), findsNothing);
     expect(find.text('سجل الأحداث'), findsNothing);
+  });
+
+  testWidgets('Detail pages open as immersive expanded examples', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
+
+    await tester.tap(find.byTooltip('افتح صفحة الاختبارات'));
+    await tester.pumpAndSettle();
+
+    final detailButton = find.byKey(const Key('orders_filter_detail_button'));
+    await _bringFinderIntoComfortableView(tester, detailButton);
+    await tester.tap(detailButton);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('orders_filter_detail_page')), findsOneWidget);
+    expect(
+      find.byKey(const Key('orders_filter_detail_backdrop')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('orders_filter_detail_open')), findsNothing);
+
+    await tester.tap(find.byKey(const Key('orders_filter_detail_backdrop')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('orders_filter_detail_backdrop')),
+      findsNothing,
+    );
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('Showcase scenarios expand and close from outside tap', (
@@ -60,58 +138,22 @@ void main() {
     await tester.tap(find.byTooltip('افتح صفحة الاختبارات'));
     await tester.pumpAndSettle();
 
-    final topDismissPoint =
-        tester.getCenter(find.byKey(const Key('top_surface_toggle'))) -
-        const Offset(240, 0);
-    await tester.tap(find.byKey(const Key('top_surface_toggle')));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 150));
-    await tester.pumpAndSettle();
-    final topBackdrop = find.byKey(const Key('top_surface_backdrop'));
-    expect(topBackdrop, findsOneWidget);
-    await tester.tapAt(topDismissPoint);
-    await tester.pumpAndSettle();
-    expect(topBackdrop, findsNothing);
+    for (final scene in _showcaseScenes) {
+      final toggleFinder = find.byKey(scene.toggleKey);
+      await _bringFinderIntoComfortableView(tester, toggleFinder);
 
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('center_surface_toggle')),
-      180,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
-    final centerDismissPoint =
-        tester.getCenter(find.byKey(const Key('center_surface_toggle'))) -
-        const Offset(180, 0);
-    await tester.tap(find.byKey(const Key('center_surface_toggle')));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 150));
-    await tester.pumpAndSettle();
-    final centerBackdrop = find.byKey(const Key('center_surface_backdrop'));
-    expect(centerBackdrop, findsOneWidget);
-    await tester.tapAt(centerDismissPoint);
-    await tester.pumpAndSettle();
-    expect(centerBackdrop, findsNothing);
+      final toggleCenter = tester.getCenter(toggleFinder);
+      await tester.tap(toggleFinder.hitTestable());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 150));
+      await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('bottom_surface_toggle')),
-      180,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
-    await tester.drag(find.byType(Scrollable).first, const Offset(0, -140));
-    await tester.pumpAndSettle();
-    final bottomToggle = find.byKey(const Key('bottom_surface_toggle'));
-    final bottomToggleCenter = tester.getCenter(bottomToggle);
-    final bottomDismissPoint = bottomToggleCenter - const Offset(0, 230);
-    await tester.tap(bottomToggle);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 150));
-    await tester.pumpAndSettle();
-    final bottomBackdrop = find.byKey(const Key('bottom_surface_backdrop'));
-    expect(bottomBackdrop, findsOneWidget);
-    await tester.tapAt(bottomDismissPoint);
-    await tester.pumpAndSettle();
-    expect(bottomBackdrop, findsNothing);
+      final backdropFinder = find.byKey(scene.backdropKey);
+      expect(backdropFinder, findsOneWidget);
+      await tester.tapAt(toggleCenter + scene.dismissDelta);
+      await tester.pumpAndSettle();
+      expect(backdropFinder, findsNothing);
+    }
 
     expect(tester.takeException(), isNull);
   });
@@ -266,4 +308,35 @@ double _surfaceTopOffset(WidgetTester tester) {
   final hostTopLeft = tester.getTopLeft(find.byKey(_hostKey));
   final surfaceTopLeft = tester.getTopLeft(find.byType(ClipRRect));
   return surfaceTopLeft.dy - hostTopLeft.dy;
+}
+
+Future<void> _bringFinderIntoComfortableView(
+  WidgetTester tester,
+  Finder finder,
+) async {
+  final page = find.byType(Scrollable).first;
+
+  await _dragPageUntilVisible(tester, finder);
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+
+  final center = tester.getCenter(finder);
+  const targetY = 320.0;
+  final delta = center.dy - targetY;
+
+  if (delta.abs() > 40) {
+    await tester.drag(page, Offset(0, -delta));
+    await tester.pumpAndSettle();
+  }
+}
+
+Future<void> _dragPageUntilVisible(WidgetTester tester, Finder finder) async {
+  final page = find.byType(Scrollable).first;
+  var attempts = 0;
+
+  while (finder.evaluate().isEmpty && attempts < 20) {
+    await tester.drag(page, const Offset(0, -260));
+    await tester.pumpAndSettle();
+    attempts += 1;
+  }
 }
