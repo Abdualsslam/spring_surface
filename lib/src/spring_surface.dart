@@ -237,7 +237,14 @@ class _SpringSurfaceState extends State<SpringSurface>
       config: cfg,
     );
 
-    final pulse = isCollapsing ? 1.0 : SpringSurfaceMotion.overshootPulse(t);
+    final pulse = isCollapsing
+        ? 1.0
+        : SpringSurfaceMotion.overshootPulse(
+            t,
+            amplitude: SpringSurfaceMotion.overshootAmplitudeForClamp(
+              cfg.overshootClamp,
+            ),
+          );
 
     final baseW = lerpDouble(
       widget.collapsedSize.width,

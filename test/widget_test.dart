@@ -7,6 +7,14 @@ const Size _collapsedSize = Size(100, 40);
 const Size _expandedSize = Size(220, 260);
 
 void main() {
+  test('overshootClamp increases the visible overshoot amplitude mapping', () {
+    expect(SpringSurfaceMotion.overshootAmplitudeForClamp(1.0), 0.0);
+    expect(
+      SpringSurfaceMotion.overshootAmplitudeForClamp(1.12),
+      greaterThan(SpringSurfaceMotion.overshootAmplitudeForClamp(1.03)),
+    );
+  });
+
   testWidgets('fixed sizing keeps the explicit expandedSize', (
     WidgetTester tester,
   ) async {

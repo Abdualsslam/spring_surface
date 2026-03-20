@@ -9,6 +9,13 @@ enum SpringSurfaceAxis { horizontal, vertical }
 class SpringSurfaceMotion {
   const SpringSurfaceMotion._();
 
+  static double overshootAmplitudeForClamp(double overshootClamp) {
+    if (overshootClamp <= 1.0) {
+      return 0.0;
+    }
+    return ((overshootClamp - 1.0) * 3.0).clamp(0.0, 0.18);
+  }
+
   static double axisProgress(
     double progress, {
     required bool isCollapsing,

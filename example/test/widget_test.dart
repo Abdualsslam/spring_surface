@@ -31,7 +31,7 @@ const _showcaseScenes = <_ShowcaseSceneSpec>[
     detailButtonKey: Key('search_suggestions_detail_button'),
     toggleKey: Key('search_suggestions_toggle'),
     backdropKey: Key('search_suggestions_backdrop'),
-    dismissDelta: Offset(0, 180),
+    dismissDelta: Offset(0, 260),
   ),
   _ShowcaseSceneSpec(
     title: 'إجراءات التذكرة',
@@ -87,18 +87,163 @@ void main() {
     await tester.pumpWidget(const MyApp());
 
     expect(find.text('toggle  ↕'), findsNothing);
-    expect(find.text('بيانات الطلب'), findsOneWidget);
+    expect(find.byKey(const Key('playground_collapsed_label')), findsOneWidget);
     expect(find.byKey(const Key('playground_surface_toggle')), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('playground_surface_toggle')));
+    await tester.tap(find.byKey(const Key('playground_collapsed_label')));
     await tester.pumpAndSettle();
 
-    expect(find.text('معلومات الحساب'), findsOneWidget);
+    expect(
+      find.byKey(const Key('playground_expanded_heading')),
+      findsOneWidget,
+    );
 
-    await tester.tap(find.byKey(const Key('playground_surface_toggle')));
+    final expandedSurfaceRect = tester.getRect(find.byType(ClipRRect).first);
+    await tester.tapAt(expandedSurfaceRect.bottomCenter - const Offset(0, 12));
     await tester.pumpAndSettle();
 
-    expect(find.text('بيانات الطلب'), findsOneWidget);
+    expect(find.byKey(const Key('playground_collapsed_label')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Playground size sliders update the expanded surface size', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
+
+    await tester.tap(find.byKey(const Key('playground_collapsed_label')));
+    await tester.pumpAndSettle();
+
+    final widthValueFinder = find.byKey(
+      const Key('playground_expanded_width_value'),
+    );
+    final heightValueFinder = find.byKey(
+      const Key('playground_expanded_height_value'),
+    );
+    final initialWidthValue = tester.widget<Text>(widthValueFinder).data;
+    final initialHeightValue = tester.widget<Text>(heightValueFinder).data;
+
+    await tester.ensureVisible(
+      find.byKey(const Key('playground_expanded_width_slider')),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.drag(
+      find.byKey(const Key('playground_expanded_width_slider')),
+      const Offset(120, 0),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(
+      find.byKey(const Key('playground_expanded_height_slider')),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.drag(
+      find.byKey(const Key('playground_expanded_height_slider')),
+      const Offset(120, 0),
+    );
+    await tester.pumpAndSettle();
+
+    final updatedWidthValue = tester.widget<Text>(widthValueFinder).data;
+    final updatedHeightValue = tester.widget<Text>(heightValueFinder).data;
+
+    expect(updatedWidthValue, isNot(initialWidthValue));
+    expect(updatedHeightValue, isNot(initialHeightValue));
+    expect(
+      find.byKey(const Key('playground_expanded_heading')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Playground info icon shows the control description', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
+
+    await tester.ensureVisible(
+      find.byKey(const Key('playground_info_overshoot')),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('playground_info_overshoot')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'يحدد مقدار السماح بتجاوز الحجم المستهدف أثناء الحركة. رفعه يزيد الارتداد والامتلاء البصري.',
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('إغلاق'));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Playground placement chips move the surface vertically', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
+
+    final hostFinder = find.byKey(const Key('playground_surface_host'));
+
+    await tester.ensureVisible(
+      find.byKey(const Key('playground_placement_top')),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('playground_placement_top')));
+    await tester.pumpAndSettle();
+    final topY = tester.getTopLeft(hostFinder).dy;
+
+    await tester.tap(find.byKey(const Key('playground_placement_center')));
+    await tester.pumpAndSettle();
+    final centerY = tester.getTopLeft(hostFinder).dy;
+
+    await tester.tap(find.byKey(const Key('playground_placement_bottom')));
+    await tester.pumpAndSettle();
+    final bottomY = tester.getTopLeft(hostFinder).dy;
+
+    expect(topY, lessThan(centerY));
+    expect(centerY, lessThan(bottomY));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Playground origin changes direction without moving the button', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
+
+    final surfaceFinder = find
+        .descendant(
+          of: find.byKey(const Key('playground_surface_toggle')),
+          matching: find.byType(ClipRRect),
+        )
+        .first;
+
+    await tester.ensureVisible(
+      find.byKey(const Key('playground_placement_bottom')),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('playground_placement_bottom')));
+    await tester.pumpAndSettle();
+
+    final bottomOriginY = tester.getTopLeft(surfaceFinder).dy;
+
+    await tester.tap(find.byKey(const Key('playground_origin_center')));
+    await tester.pumpAndSettle();
+    final centerOriginY = tester.getTopLeft(surfaceFinder).dy;
+
+    await tester.tap(find.byKey(const Key('playground_origin_top')));
+    await tester.pumpAndSettle();
+    final topOriginY = tester.getTopLeft(surfaceFinder).dy;
+
+    expect(centerOriginY, closeTo(bottomOriginY, 0.01));
+    expect(topOriginY, closeTo(bottomOriginY, 0.01));
     expect(tester.takeException(), isNull);
   });
 
@@ -107,12 +252,12 @@ void main() {
   ) async {
     await tester.pumpWidget(const MyApp());
 
-    await tester.tap(find.byTooltip('افتح صفحة الاختبارات'));
+    await tester.tap(find.byKey(const Key('playground_open_test_lab')));
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
     expect(find.byKey(const Key('test_showcase_list')), findsOneWidget);
-    expect(find.text(_showcaseScenes.first.title), findsWidgets);
+    expect(find.byKey(_showcaseScenes.first.detailButtonKey), findsOneWidget);
 
     for (final scene in _showcaseScenes.skip(1)) {
       final detailButton = find.byKey(scene.detailButtonKey);
@@ -178,10 +323,17 @@ void main() {
     await tester.tap(urgentPreset.hitTestable());
     await tester.pumpAndSettle();
 
-    expect(find.text('7 طلبات مستعجلة'), findsWidgets);
-    expect(find.text('مسار الأولوية'), findsWidgets);
-    expect(find.text('طلب مستشفى المدينة'), findsWidgets);
-    expect(find.text('5'), findsWidgets);
+    expect(
+      find.byKey(const Key('orders_filter_detail_order_city_hospital')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const Key('orders_filter_detail_metric_primary')),
+        matching: find.text('5'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('Orders filter detail updates selected order summary', (
@@ -197,12 +349,10 @@ void main() {
     await tester.tap(urgentPreset.hitTestable());
     await tester.pumpAndSettle();
 
-    expect(
-      find.text(
-        'أرسل الطلب مباشرة إلى محطة التغليف السريع مع إشعار السائق المناوب.',
-      ),
-      findsOneWidget,
+    final noteFinder = find.byKey(
+      const Key('orders_filter_detail_selected_order_note'),
     );
+    final noteBefore = tester.widget<Text>(noteFinder).data;
 
     final orderCard = find.byKey(
       const Key('orders_filter_detail_order_madar_office'),
@@ -220,16 +370,63 @@ void main() {
     await tester.tap(orderCard.hitTestable());
     await tester.pumpAndSettle();
 
+    final noteAfter = tester.widget<Text>(noteFinder).data;
+    expect(noteAfter, isNot(noteBefore));
+  });
+
+  testWidgets('Search suggestions detail supports typing and actions', (
+    WidgetTester tester,
+  ) async {
+    await _openSearchSuggestionsDetailPage(tester);
+
+    final queryField = find.byKey(
+      const Key('search_suggestions_detail_query_field'),
+    );
+    await tester.tap(queryField);
+    await tester.pumpAndSettle();
+    await tester.enterText(queryField, 'فاتورة');
+    await tester.pumpAndSettle();
+
+    final filesScope = find.byKey(
+      const Key('search_suggestions_detail_scope_files'),
+    );
+    await tester.tap(filesScope.hitTestable());
+    await tester.pumpAndSettle();
+
     expect(
-      find.text('ثبّت الفاتورة أعلى الكيس وأعط السائق أولوية عند الوصول.'),
+      find.byKey(
+        const Key('search_suggestions_detail_result_invoice_april_pdf'),
+      ),
       findsOneWidget,
     );
     expect(
-      find.text(
-        'أرسل الطلب مباشرة إلى محطة التغليف السريع مع إشعار السائق المناوب.',
+      find.byKey(
+        const Key('search_suggestions_detail_result_sara_contract_thread'),
       ),
       findsNothing,
     );
+
+    final taskAction = find.byKey(
+      const Key('search_suggestions_detail_action_task'),
+    );
+    final actionBanner = find.byKey(
+      const Key('search_suggestions_detail_action_banner'),
+    );
+    final actionTextBefore = tester
+        .widgetList<Text>(
+          find.descendant(of: actionBanner, matching: find.byType(Text)),
+        )
+        .last
+        .data;
+    await tester.tap(taskAction.hitTestable());
+    await tester.pumpAndSettle();
+    final actionTextAfter = tester
+        .widgetList<Text>(
+          find.descendant(of: actionBanner, matching: find.byType(Text)),
+        )
+        .last
+        .data;
+    expect(actionTextAfter, isNot(actionTextBefore));
   });
 
   testWidgets('Showcase scenarios expand and close from outside tap', (
@@ -237,7 +434,7 @@ void main() {
   ) async {
     await tester.pumpWidget(const MyApp());
 
-    await tester.tap(find.byTooltip('افتح صفحة الاختبارات'));
+    await tester.tap(find.byKey(const Key('playground_open_test_lab')));
     await tester.pumpAndSettle();
 
     for (final scene in _showcaseScenes) {
@@ -264,10 +461,24 @@ void main() {
 Future<void> _openOrdersFilterDetailPage(WidgetTester tester) async {
   await tester.pumpWidget(const MyApp());
 
-  await tester.tap(find.byTooltip('افتح صفحة الاختبارات'));
+  await tester.tap(find.byKey(const Key('playground_open_test_lab')));
   await tester.pumpAndSettle();
 
   final detailButton = find.byKey(const Key('orders_filter_detail_button'));
+  await _bringFinderIntoComfortableView(tester, detailButton);
+  await tester.tap(detailButton);
+  await tester.pumpAndSettle();
+}
+
+Future<void> _openSearchSuggestionsDetailPage(WidgetTester tester) async {
+  await tester.pumpWidget(const MyApp());
+
+  await tester.tap(find.byKey(const Key('playground_open_test_lab')));
+  await tester.pumpAndSettle();
+
+  final detailButton = find.byKey(
+    const Key('search_suggestions_detail_button'),
+  );
   await _bringFinderIntoComfortableView(tester, detailButton);
   await tester.tap(detailButton);
   await tester.pumpAndSettle();

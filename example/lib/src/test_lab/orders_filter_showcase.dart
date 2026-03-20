@@ -486,18 +486,24 @@ class OrdersFilterScenarioState
               key: Key('${widget.keyPrefix}_metrics_row'),
               children: [
                 Expanded(
-                  child: MetricTile(
-                    label: 'مكتملة',
-                    value: presetData.primaryValue,
-                    tint: const Color(0xFFE4EEFD),
+                  child: KeyedSubtree(
+                    key: Key('${widget.keyPrefix}_metric_primary'),
+                    child: MetricTile(
+                      label: 'مكتملة',
+                      value: presetData.primaryValue,
+                      tint: const Color(0xFFE4EEFD),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: MetricTile(
-                    label: 'تحتاج متابعة',
-                    value: presetData.secondaryValue,
-                    tint: const Color(0xFFFFF3DD),
+                  child: KeyedSubtree(
+                    key: Key('${widget.keyPrefix}_metric_secondary'),
+                    child: MetricTile(
+                      label: 'تحتاج متابعة',
+                      value: presetData.secondaryValue,
+                      tint: const Color(0xFFFFF3DD),
+                    ),
                   ),
                 ),
               ],
@@ -782,6 +788,7 @@ class _OrdersFilterPanel extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
+                key: Key('${keyPrefix}_selected_order_title'),
                 selectedOrder.title,
                 style: Theme.of(
                   context,
@@ -789,6 +796,7 @@ class _OrdersFilterPanel extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
+                key: Key('${keyPrefix}_selected_order_note'),
                 selectedOrder.note,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Colors.black54,
