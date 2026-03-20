@@ -8,53 +8,18 @@ import 'showcase_shared_widgets.dart';
 
 enum _NotificationMode { all, importantOnly, silent }
 
-class SettingsInlineDetailExperience extends StatefulWidget {
-  const SettingsInlineDetailExperience();
-
-  @override
-  State<SettingsInlineDetailExperience> createState() =>
-      SettingsInlineDetailExperienceState();
-}
-
-class SettingsInlineDetailExperienceState
-    extends State<SettingsInlineDetailExperience> {
-  final _sceneKey = GlobalKey<SettingsInlineScenarioState>();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _sceneKey.currentState?.open();
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: SettingsInlineScenario(
-        key: _sceneKey,
-        presentation: ScenarioPresentation.detail,
-        keyPrefix: 'settings_inline_detail',
-      ),
-    );
-  }
-}
-
 class SettingsInlineScenario extends StatefulWidget {
   const SettingsInlineScenario({
     super.key,
-    this.presentation = ScenarioPresentation.compact,
+    this.displayMode = ScenarioDisplayMode.compact,
     this.keyPrefix = 'settings_inline',
   });
 
-  final ScenarioPresentation presentation;
+  final ScenarioDisplayMode displayMode;
   final String keyPrefix;
 
   @override
-  State<SettingsInlineScenario> createState() =>
-      SettingsInlineScenarioState();
+  State<SettingsInlineScenario> createState() => SettingsInlineScenarioState();
 }
 
 class SettingsInlineScenarioState
@@ -202,7 +167,7 @@ class SettingsInlineScenarioState
                 top: 160,
                 left: 24,
                 right: 24,
-                height: widget.presentation.isDetail ? 252 : 236,
+                height: widget.displayMode.isFeatured ? 252 : 236,
                 child: SpringSurface(
                   isExpanded: isExpanded,
                   origin: SpringSurfaceOrigin.top,
@@ -210,10 +175,10 @@ class SettingsInlineScenarioState
                   collapsedSize: Size(surfaceWidth, 52),
                   expandedSize: Size(
                     surfaceWidth,
-                    widget.presentation.isDetail ? 202 : 190,
+                    widget.displayMode.isFeatured ? 202 : 190,
                   ),
                   expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
-                  maxExpandedHeight: widget.presentation.isDetail ? 202 : 188,
+                  maxExpandedHeight: widget.displayMode.isFeatured ? 202 : 188,
                   collapsedDecoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(18),

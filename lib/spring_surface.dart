@@ -3,6 +3,7 @@
 // Usage (Widget-only):
 // SpringSurface(
 //   isExpanded: _isExpanded,
+//   anchor: SpringSurfaceAnchor.bottomLeft,
 //   config: SpringSurfaceConfig.gentle(),
 //   collapsedChild: MyButton(),
 //   expandedChild: MySheet(),

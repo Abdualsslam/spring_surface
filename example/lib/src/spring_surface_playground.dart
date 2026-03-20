@@ -2,8 +2,50 @@ import 'package:flutter/material.dart';
 import 'package:spring_surface/spring_surface.dart';
 
 import 'spring_surface_test_lab_page.dart';
+import 'spring_surface_unified_showcase_page.dart';
 
 enum _PlaygroundPlacement { top, center, bottom }
+
+const List<List<SpringSurfaceAnchor>> _anchorGrid = [
+  [
+    SpringSurfaceAnchor.topLeft,
+    SpringSurfaceAnchor.topCenter,
+    SpringSurfaceAnchor.topRight,
+  ],
+  [
+    SpringSurfaceAnchor.centerLeft,
+    SpringSurfaceAnchor.center,
+    SpringSurfaceAnchor.centerRight,
+  ],
+  [
+    SpringSurfaceAnchor.bottomLeft,
+    SpringSurfaceAnchor.bottomCenter,
+    SpringSurfaceAnchor.bottomRight,
+  ],
+];
+
+String _anchorLabel(SpringSurfaceAnchor anchor) {
+  switch (anchor) {
+    case SpringSurfaceAnchor.topLeft:
+      return 'TL';
+    case SpringSurfaceAnchor.topCenter:
+      return 'T';
+    case SpringSurfaceAnchor.topRight:
+      return 'TR';
+    case SpringSurfaceAnchor.centerLeft:
+      return 'L';
+    case SpringSurfaceAnchor.center:
+      return 'C';
+    case SpringSurfaceAnchor.centerRight:
+      return 'R';
+    case SpringSurfaceAnchor.bottomLeft:
+      return 'BL';
+    case SpringSurfaceAnchor.bottomCenter:
+      return 'B';
+    case SpringSurfaceAnchor.bottomRight:
+      return 'BR';
+  }
+}
 
 class SpringSurfacePlayground extends StatefulWidget {
   const SpringSurfacePlayground({super.key});
@@ -30,7 +72,7 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
   double _overshootClamp = 1.03;
   int _expandDurationMs = 600;
   int _collapseDurationMs = 600;
-  SpringSurfaceOrigin _origin = SpringSurfaceOrigin.bottom;
+  SpringSurfaceAnchor _anchor = SpringSurfaceAnchor.bottomCenter;
   _PlaygroundPlacement _placement = _PlaygroundPlacement.center;
 
   Size get _collapsedSize => Size(_collapsedWidth, _collapsedHeight);
@@ -44,15 +86,42 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
           : _collapsedHeight) +
       56;
 
-  double _collapsedTopOffsetInHost() {
-    switch (_origin) {
-      case SpringSurfaceOrigin.top:
+  double _collapsedLeftOffsetInHost() {
+    switch (_anchor) {
+      case SpringSurfaceAnchor.topLeft:
+      case SpringSurfaceAnchor.centerLeft:
+      case SpringSurfaceAnchor.bottomLeft:
         return 0;
-      case SpringSurfaceOrigin.center:
+      case SpringSurfaceAnchor.topCenter:
+      case SpringSurfaceAnchor.center:
+      case SpringSurfaceAnchor.bottomCenter:
+        return (_surfaceHostWidth - _collapsedWidth) / 2;
+      case SpringSurfaceAnchor.topRight:
+      case SpringSurfaceAnchor.centerRight:
+      case SpringSurfaceAnchor.bottomRight:
+        return _surfaceHostWidth - _collapsedWidth;
+    }
+  }
+
+  double _collapsedTopOffsetInHost() {
+    switch (_anchor) {
+      case SpringSurfaceAnchor.topLeft:
+      case SpringSurfaceAnchor.topCenter:
+      case SpringSurfaceAnchor.topRight:
+        return 0;
+      case SpringSurfaceAnchor.centerLeft:
+      case SpringSurfaceAnchor.center:
+      case SpringSurfaceAnchor.centerRight:
         return (_surfaceHostHeight - _collapsedHeight) / 2;
-      case SpringSurfaceOrigin.bottom:
+      case SpringSurfaceAnchor.bottomLeft:
+      case SpringSurfaceAnchor.bottomCenter:
+      case SpringSurfaceAnchor.bottomRight:
         return _surfaceHostHeight - _collapsedHeight;
     }
+  }
+
+  double _desiredCollapsedLeft(double availableWidth) {
+    return (availableWidth - _collapsedWidth) / 2;
   }
 
   double _desiredCollapsedTop(double availableHeight) {
@@ -68,6 +137,10 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
 
   double _surfaceHostTop(double availableHeight) {
     return _desiredCollapsedTop(availableHeight) - _collapsedTopOffsetInHost();
+  }
+
+  double _surfaceHostLeft(double availableWidth) {
+    return _desiredCollapsedLeft(availableWidth) - _collapsedLeftOffsetInHost();
   }
 
   SpringSurfaceConfig get _config => SpringSurfaceConfig(
@@ -107,6 +180,16 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
             },
             icon: const Icon(Icons.science_outlined),
           ),
+          IconButton(
+            key: const Key('playground_open_unified_showcase'),
+            tooltip: 'Unified showcase',
+            onPressed: () {
+              Navigator.of(
+                context,
+              ).pushNamed(SpringSurfaceUnifiedShowcasePage.routeName);
+            },
+            icon: const Icon(Icons.dashboard_customize_outlined),
+          ),
         ],
       ),
       body: SafeArea(
@@ -122,8 +205,7 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
                 ),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final hostLeft =
-                        (constraints.maxWidth - _surfaceHostWidth) / 2;
+                    final hostLeft = _surfaceHostLeft(constraints.maxWidth);
                     final hostTop = _surfaceHostTop(constraints.maxHeight);
 
                     return Stack(
@@ -144,7 +226,7 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
                               height: _surfaceHostHeight,
                               child: SpringSurface(
                                 isExpanded: _isExpanded,
-                                origin: _origin,
+                                anchor: _anchor,
                                 config: _config,
                                 collapsedSize: _collapsedSize,
                                 expandedSize: _expandedSize,
@@ -209,7 +291,7 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
               overshootClamp: _overshootClamp,
               expandDurationMs: _expandDurationMs,
               collapseDurationMs: _collapseDurationMs,
-              origin: _origin,
+              anchor: _anchor,
               placement: _placement,
               onCollapsedWidth: (value) =>
                   setState(() => _collapsedWidth = value),
@@ -225,7 +307,7 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
                   setState(() => _expandDurationMs = value),
               onCollapseDuration: (value) =>
                   setState(() => _collapseDurationMs = value),
-              onOrigin: (value) => setState(() => _origin = value),
+              onAnchor: (value) => setState(() => _anchor = value),
               onPlacement: (value) => setState(() => _placement = value),
               onPreset: _applyPreset,
             ),
@@ -321,7 +403,7 @@ class _ControlsPanel extends StatelessWidget {
     required this.overshootClamp,
     required this.expandDurationMs,
     required this.collapseDurationMs,
-    required this.origin,
+    required this.anchor,
     required this.placement,
     required this.onCollapsedWidth,
     required this.onCollapsedHeight,
@@ -330,7 +412,7 @@ class _ControlsPanel extends StatelessWidget {
     required this.onExpandedHeight,
     required this.onExpandDuration,
     required this.onCollapseDuration,
-    required this.onOrigin,
+    required this.onAnchor,
     required this.onPlacement,
     required this.onPreset,
   });
@@ -342,7 +424,7 @@ class _ControlsPanel extends StatelessWidget {
   final double overshootClamp;
   final int expandDurationMs;
   final int collapseDurationMs;
-  final SpringSurfaceOrigin origin;
+  final SpringSurfaceAnchor anchor;
   final _PlaygroundPlacement placement;
   final ValueChanged<double> onCollapsedWidth;
   final ValueChanged<double> onCollapsedHeight;
@@ -351,7 +433,7 @@ class _ControlsPanel extends StatelessWidget {
   final ValueChanged<double> onExpandedHeight;
   final ValueChanged<int> onExpandDuration;
   final ValueChanged<int> onCollapseDuration;
-  final ValueChanged<SpringSurfaceOrigin> onOrigin;
+  final ValueChanged<SpringSurfaceAnchor> onAnchor;
   final ValueChanged<_PlaygroundPlacement> onPlacement;
   final ValueChanged<SpringSurfaceConfig> onPreset;
 
@@ -461,36 +543,41 @@ class _ControlsPanel extends StatelessWidget {
                   'مدة إغلاق القطعة بالمللي ثانية. القيم الأكبر تعطي إغلاقًا أبطأ وأكثر سلاسة.',
             ),
             _SectionHeader(
-              title: 'origin',
-              infoKey: const Key('playground_info_origin'),
+              title: 'anchor',
+              infoKey: const Key('playground_info_anchor'),
               description:
-                  'يحدد نقطة بداية التمدد: من الأسفل أو الوسط أو الأعلى حسب إحساس الحركة الذي تريده.',
+                  'Choose the edge or corner that stays pinned while the surface grows. In dynamicHeight, the horizontal part collapses back to the center column.',
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _OriginChip(
-                  key: const Key('playground_origin_bottom'),
-                  label: 'bottom',
-                  value: SpringSurfaceOrigin.bottom,
-                  current: origin,
-                  onTap: onOrigin,
-                ),
-                _OriginChip(
-                  key: const Key('playground_origin_center'),
-                  label: 'center',
-                  value: SpringSurfaceOrigin.center,
-                  current: origin,
-                  onTap: onOrigin,
-                ),
-                _OriginChip(
-                  key: const Key('playground_origin_top'),
-                  label: 'top',
-                  value: SpringSurfaceOrigin.top,
-                  current: origin,
-                  onTap: onOrigin,
-                ),
-              ],
+            Column(
+              children: _anchorGrid
+                  .map(
+                    (row) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: row
+                            .map(
+                              (value) => _AnchorChip(
+                                key: Key('playground_anchor_${value.name}'),
+                                label: _anchorLabel(value),
+                                value: value,
+                                current: anchor,
+                                onTap: onAnchor,
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(
+                'Combined corner anchors matter in fixed sizing. Dynamic height keeps only the vertical row.',
+                style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                textAlign: TextAlign.center,
+              ),
             ),
             const SizedBox(height: 14),
             const _SectionLabel(title: 'Local Playground Controls'),
@@ -694,8 +781,8 @@ class _PlacementChip extends StatelessWidget {
   }
 }
 
-class _OriginChip extends StatelessWidget {
-  const _OriginChip({
+class _AnchorChip extends StatelessWidget {
+  const _AnchorChip({
     super.key,
     required this.label,
     required this.value,
@@ -704,9 +791,9 @@ class _OriginChip extends StatelessWidget {
   });
 
   final String label;
-  final SpringSurfaceOrigin value;
-  final SpringSurfaceOrigin current;
-  final ValueChanged<SpringSurfaceOrigin> onTap;
+  final SpringSurfaceAnchor value;
+  final SpringSurfaceAnchor current;
+  final ValueChanged<SpringSurfaceAnchor> onTap;
 
   @override
   Widget build(BuildContext context) {

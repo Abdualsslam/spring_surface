@@ -2,54 +2,21 @@
 
 import 'package:flutter/material.dart';
 import 'package:spring_surface/spring_surface.dart';
+
 import 'showcase_models.dart';
 import 'showcase_shell.dart';
 import 'showcase_shared_widgets.dart';
 
 enum _PaymentMethod { mada, applePay, card }
 
-class CheckoutSummaryDetailExperience extends StatefulWidget {
-  const CheckoutSummaryDetailExperience();
-
-  @override
-  State<CheckoutSummaryDetailExperience> createState() =>
-      CheckoutSummaryDetailExperienceState();
-}
-
-class CheckoutSummaryDetailExperienceState
-    extends State<CheckoutSummaryDetailExperience> {
-  final _sceneKey = GlobalKey<CheckoutSummaryScenarioState>();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _sceneKey.currentState?.open();
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: CheckoutSummaryScenario(
-        key: _sceneKey,
-        presentation: ScenarioPresentation.detail,
-        keyPrefix: 'checkout_summary_detail',
-      ),
-    );
-  }
-}
-
 class CheckoutSummaryScenario extends StatefulWidget {
   const CheckoutSummaryScenario({
     super.key,
-    this.presentation = ScenarioPresentation.compact,
+    this.displayMode = ScenarioDisplayMode.compact,
     this.keyPrefix = 'checkout_summary',
   });
 
-  final ScenarioPresentation presentation;
+  final ScenarioDisplayMode displayMode;
   final String keyPrefix;
 
   @override
@@ -95,174 +62,104 @@ class CheckoutSummaryScenarioState
         methodDescription = 'بطاقة ائتمانية •••• 1930';
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final surfaceWidth = constraints.maxWidth - 32;
-
-        return DecoratedBox(
-          key: Key('${widget.keyPrefix}_canvas'),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFFFFBF6), Color(0xFFFFF4EC)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'سلة المشتريات',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.w800),
-                            ),
-                          ),
-                          const ShowcaseBadge(label: '3 عناصر'),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on_outlined,
-                              color: accent,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'التوصيل إلى المنزل',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleSmall
-                                        ?.copyWith(fontWeight: FontWeight.w800),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'حي الروضة، شارع الأمير سلطان',
-                                    style: Theme.of(context).textTheme.bodySmall
-                                        ?.copyWith(color: Colors.black54),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Icon(Icons.chevron_left_rounded),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Expanded(
-                        child: Column(
-                          children: [
-                            CartLine(
-                              title: 'سماعة لاسلكية',
-                              subtitle: 'لون رمادي',
-                              amount: '79 ر.س',
-                            ),
-                            SizedBox(height: 10),
-                            CartLine(
-                              title: 'غلاف حماية',
-                              subtitle: 'مقاس كامل',
-                              amount: '18 ر.س',
-                            ),
-                            SizedBox(height: 10),
-                            CartLine(
-                              title: 'شاحن سريع',
-                              subtitle: 'منفذ Type-C',
-                              amount: '35 ر.س',
-                            ),
-                            Spacer(),
-                            SizedBox(height: 68),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+    return BottomDockScenarioShell(
+      keyPrefix: widget.keyPrefix,
+      displayMode: widget.displayMode,
+      isExpanded: isExpanded,
+      onToggle: toggle,
+      onClose: close,
+      accent: accent,
+      gradient: const LinearGradient(
+        colors: [Color(0xFFFFFBF6), Color(0xFFFFF4EC)],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ),
+      title: 'سلة المشتريات',
+      badgeLabel: '3 عناصر',
+      surfaceConfig: const SpringSurfaceConfig(),
+      collapsedHeight: 60,
+      expandedHeightCompact: 248,
+      expandedHeightFeatured: 264,
+      surfaceHostHeightCompact: 286,
+      surfaceHostHeightFeatured: 302,
+      backgroundBuilder: (context) {
+        return Column(
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
               ),
-              if (isExpanded)
-                ScenarioBackdrop(
-                  backdropKey: Key('${widget.keyPrefix}_backdrop'),
-                  onTap: close,
-                ),
-              Positioned(
-                left: 16,
-                right: 16,
-                bottom: 16,
-                height: widget.presentation.isDetail ? 302 : 286,
-                child: SpringSurface(
-                  isExpanded: isExpanded,
-                  origin: SpringSurfaceOrigin.bottom,
-                  config: const SpringSurfaceConfig(),
-                  collapsedSize: Size(surfaceWidth, 60),
-                  expandedSize: Size(
-                    surfaceWidth,
-                    widget.presentation.isDetail ? 264 : 248,
-                  ),
-                  collapsedDecoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: accent.withAlpha(34)),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x12000000),
-                        blurRadius: 22,
-                        offset: Offset(0, 12),
-                      ),
-                    ],
-                  ),
-                  expandedDecoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: accent.withAlpha(36)),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x14000000),
-                        blurRadius: 28,
-                        offset: Offset(0, 14),
-                      ),
-                    ],
-                  ),
-                  collapsedChild: GestureDetector(
-                    key: Key('${widget.keyPrefix}_toggle'),
-                    behavior: HitTestBehavior.opaque,
-                    onTap: toggle,
-                    child: CheckoutDockBar(
-                      total: total,
-                      accent: accent,
-                      methodLabel: methodLabel,
+              child: Row(
+                children: [
+                  const Icon(Icons.location_on_outlined, color: accent),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'التوصيل إلى المنزل',
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'حي الروضة، شارع الأمير سلطان',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: Colors.black54),
+                        ),
+                      ],
                     ),
                   ),
-                  expandedChild: _CheckoutSummaryPanel(
-                    onToggle: toggle,
-                    subtotal: subtotal,
-                    discount: discount,
-                    delivery: delivery,
-                    total: total,
-                    methodDescription: methodDescription,
-                  ),
-                ),
+                  const Icon(Icons.chevron_left_rounded),
+                ],
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 12),
+            const Expanded(
+              child: Column(
+                children: [
+                  CartLine(
+                    title: 'سماعة لاسلكية',
+                    subtitle: 'لون رمادي',
+                    amount: '79 ر.س',
+                  ),
+                  SizedBox(height: 10),
+                  CartLine(
+                    title: 'غلاف حماية',
+                    subtitle: 'مقاس كامل',
+                    amount: '18 ر.س',
+                  ),
+                  SizedBox(height: 10),
+                  CartLine(
+                    title: 'شاحن سريع',
+                    subtitle: 'منفذ Type-C',
+                    amount: '35 ر.س',
+                  ),
+                  Spacer(),
+                  SizedBox(height: 68),
+                ],
+              ),
+            ),
+          ],
         );
       },
+      collapsedChild: CheckoutDockBar(
+        total: total,
+        accent: accent,
+        methodLabel: methodLabel,
+      ),
+      expandedChild: _CheckoutSummaryPanel(
+        onToggle: toggle,
+        subtotal: subtotal,
+        discount: discount,
+        delivery: delivery,
+        total: total,
+        methodDescription: methodDescription,
+      ),
     );
   }
 }

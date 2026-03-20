@@ -128,48 +128,14 @@ const _searchRecords = <_SearchRecord>[
   ),
 ];
 
-class SearchSuggestionsDetailExperience extends StatefulWidget {
-  const SearchSuggestionsDetailExperience();
-
-  @override
-  State<SearchSuggestionsDetailExperience> createState() =>
-      SearchSuggestionsDetailExperienceState();
-}
-
-class SearchSuggestionsDetailExperienceState
-    extends State<SearchSuggestionsDetailExperience> {
-  final _sceneKey = GlobalKey<SearchSuggestionsScenarioState>();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _sceneKey.currentState?.open();
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: SearchSuggestionsScenario(
-        key: _sceneKey,
-        presentation: ScenarioPresentation.detail,
-        keyPrefix: 'search_suggestions_detail',
-      ),
-    );
-  }
-}
-
 class SearchSuggestionsScenario extends StatefulWidget {
   const SearchSuggestionsScenario({
     super.key,
-    this.presentation = ScenarioPresentation.compact,
+    this.displayMode = ScenarioDisplayMode.compact,
     this.keyPrefix = 'search_suggestions',
   });
 
-  final ScenarioPresentation presentation;
+  final ScenarioDisplayMode displayMode;
   final String keyPrefix;
 
   @override
@@ -185,7 +151,7 @@ class SearchSuggestionsScenarioState
   _SearchQuickAction _activeAction = _SearchQuickAction.open;
   String? _lastActionMessage;
 
-  bool get _isDetail => widget.presentation.isDetail;
+  bool get _isFeatured => widget.displayMode.isFeatured;
 
   String get _query => _queryController.text.trim();
 
@@ -215,7 +181,7 @@ class SearchSuggestionsScenarioState
 
   String get _collapsedText {
     if (_query.isEmpty) {
-      return _isDetail
+      return _isFeatured
           ? 'ابحث باسم العميل أو الملف'
           : 'ابحث في المحادثات أو الملفات';
     }
@@ -244,10 +210,10 @@ class SearchSuggestionsScenarioState
   @override
   void initState() {
     super.initState();
-    _queryController = TextEditingController(text: _isDetail ? 'سارة' : '');
+    _queryController = TextEditingController(text: _isFeatured ? 'سارة' : '');
     _queryFocusNode = FocusNode();
     _queryController.addListener(_handleQueryChanged);
-    if (_isDetail) {
+    if (_isFeatured) {
       _activeScope = _SearchScope.conversations;
     }
   }
@@ -405,15 +371,15 @@ class SearchSuggestionsScenarioState
                 top: 50,
                 left: 16,
                 right: 16,
-                height: _isDetail ? 420 : 304,
+                height: _isFeatured ? 420 : 304,
                 child: SpringSurface(
                   isExpanded: isExpanded,
                   origin: SpringSurfaceOrigin.top,
                   config: const SpringSurfaceConfig.gentle(),
                   collapsedSize: Size(surfaceWidth, 46),
-                  expandedSize: Size(surfaceWidth, _isDetail ? 360 : 252),
+                  expandedSize: Size(surfaceWidth, _isFeatured ? 360 : 252),
                   expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
-                  maxExpandedHeight: _isDetail ? 368 : 260,
+                  maxExpandedHeight: _isFeatured ? 368 : 260,
                   collapsedDecoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(18),

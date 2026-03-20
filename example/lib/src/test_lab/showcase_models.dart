@@ -1,29 +1,48 @@
-﻿import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart';
 
-enum ScenarioPresentation { compact, detail }
+enum ScenarioDisplayMode { compact, featured }
 
-extension ScenarioPresentationX on ScenarioPresentation {
-  bool get isDetail => this == ScenarioPresentation.detail;
+extension ScenarioDisplayModeX on ScenarioDisplayMode {
+  bool get isFeatured => this == ScenarioDisplayMode.featured;
 }
 
-class ShowcaseScenarioDefinition {
-  const ShowcaseScenarioDefinition({
+enum FamilyLayoutStyle { featuredSwitcher, stackedCards }
+
+typedef ShowcaseVariantBuilder =
+    Widget Function({
+      required String keyPrefix,
+      required ScenarioDisplayMode displayMode,
+    });
+
+class ShowcaseVariantDefinition {
+  const ShowcaseVariantDefinition({
     required this.id,
     required this.title,
     required this.description,
-    required this.detailSummary,
-    required this.compactPreviewBuilder,
-    required this.detailExperienceBuilder,
+    required this.builder,
   });
 
   final String id;
   final String title;
   final String description;
-  final String detailSummary;
-  final Widget Function() compactPreviewBuilder;
-  final Widget Function() detailExperienceBuilder;
-
-  Key get detailButtonKey => Key('${id}_detail_button');
-  Key get detailPageKey => Key('${id}_detail_page');
+  final ShowcaseVariantBuilder builder;
 }
 
+class ShowcaseFamilyDefinition {
+  const ShowcaseFamilyDefinition({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.layoutStyle,
+    required this.variants,
+  }) : assert(
+         variants.length > 0,
+         'A family must contain at least one variant.',
+       );
+
+  final String id;
+  final String title;
+  final String description;
+  final FamilyLayoutStyle layoutStyle;
+  final List<ShowcaseVariantDefinition> variants;
+}

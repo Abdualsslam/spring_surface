@@ -2,54 +2,21 @@
 
 import 'package:flutter/material.dart';
 import 'package:spring_surface/spring_surface.dart';
+
 import 'showcase_models.dart';
 import 'showcase_shell.dart';
 import 'showcase_shared_widgets.dart';
 
 enum _ComposerMode { file, image, voice }
 
-class MessageComposerDetailExperience extends StatefulWidget {
-  const MessageComposerDetailExperience();
-
-  @override
-  State<MessageComposerDetailExperience> createState() =>
-      MessageComposerDetailExperienceState();
-}
-
-class MessageComposerDetailExperienceState
-    extends State<MessageComposerDetailExperience> {
-  final _sceneKey = GlobalKey<MessageComposerScenarioState>();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _sceneKey.currentState?.open();
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: MessageComposerScenario(
-        key: _sceneKey,
-        presentation: ScenarioPresentation.detail,
-        keyPrefix: 'message_composer_detail',
-      ),
-    );
-  }
-}
-
 class MessageComposerScenario extends StatefulWidget {
   const MessageComposerScenario({
     super.key,
-    this.presentation = ScenarioPresentation.compact,
+    this.displayMode = ScenarioDisplayMode.compact,
     this.keyPrefix = 'message_composer',
   });
 
-  final ScenarioPresentation presentation;
+  final ScenarioDisplayMode displayMode;
   final String keyPrefix;
 
   @override
@@ -157,123 +124,48 @@ class MessageComposerScenarioState
         ];
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final surfaceWidth = constraints.maxWidth - 32;
-
-        return DecoratedBox(
-          key: Key('${widget.keyPrefix}_canvas'),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFF6FFF9), Color(0xFFEEF9F2)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+    return BottomDockScenarioShell(
+      keyPrefix: widget.keyPrefix,
+      displayMode: widget.displayMode,
+      isExpanded: isExpanded,
+      onToggle: toggle,
+      onClose: close,
+      accent: accent,
+      gradient: const LinearGradient(
+        colors: [Color(0xFFF6FFF9), Color(0xFFEEF9F2)],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ),
+      title: 'محادثة الفريق',
+      badgeLabel: 'متصل الآن',
+      surfaceConfig: const SpringSurfaceConfig.gentle(),
+      collapsedHeight: 52,
+      expandedHeightCompact: 184,
+      expandedHeightFeatured: 196,
+      surfaceHostHeightCompact: 214,
+      surfaceHostHeightFeatured: 230,
+      backgroundBuilder: (context) {
+        return Column(
+          children: [
+            ChatBubble(text: bubbleOne, mine: false),
+            const SizedBox(height: 10),
+            const ChatBubble(
+              text: 'أرسل المختصرة الآن، والنسخة الكاملة بعد اعتماد المدير.',
+              mine: true,
             ),
-          ),
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'محادثة الفريق',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.w800),
-                            ),
-                          ),
-                          const ShowcaseBadge(label: 'متصل الآن'),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            ChatBubble(text: bubbleOne, mine: false),
-                            const SizedBox(height: 10),
-                            const ChatBubble(
-                              text:
-                                  'أرسل المختصرة الآن، والنسخة الكاملة بعد اعتماد المدير.',
-                              mine: true,
-                            ),
-                            const SizedBox(height: 10),
-                            ChatBubble(text: bubbleThree, mine: false),
-                            const Spacer(),
-                            const SizedBox(height: 58),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              if (isExpanded)
-                ScenarioBackdrop(
-                  backdropKey: Key('${widget.keyPrefix}_backdrop'),
-                  onTap: close,
-                ),
-              Positioned(
-                left: 16,
-                right: 16,
-                bottom: 16,
-                height: widget.presentation.isDetail ? 230 : 214,
-                child: SpringSurface(
-                  isExpanded: isExpanded,
-                  origin: SpringSurfaceOrigin.bottom,
-                  config: const SpringSurfaceConfig.gentle(),
-                  collapsedSize: Size(surfaceWidth, 52),
-                  expandedSize: Size(
-                    surfaceWidth,
-                    widget.presentation.isDetail ? 196 : 184,
-                  ),
-                  collapsedDecoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: accent.withAlpha(30)),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x12000000),
-                        blurRadius: 18,
-                        offset: Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  expandedDecoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: accent.withAlpha(34)),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x16000000),
-                        blurRadius: 24,
-                        offset: Offset(0, 14),
-                      ),
-                    ],
-                  ),
-                  collapsedChild: GestureDetector(
-                    key: Key('${widget.keyPrefix}_toggle'),
-                    behavior: HitTestBehavior.opaque,
-                    onTap: toggle,
-                    child: ComposerBar(
-                      placeholder: placeholder,
-                      accent: accent,
-                    ),
-                  ),
-                  expandedChild: _MessageComposerPanel(
-                    onToggle: toggle,
-                    label: panelLabel,
-                    rows: panelRows,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            const SizedBox(height: 10),
+            ChatBubble(text: bubbleThree, mine: false),
+            const Spacer(),
+            const SizedBox(height: 58),
+          ],
         );
       },
+      collapsedChild: ComposerBar(placeholder: placeholder, accent: accent),
+      expandedChild: _MessageComposerPanel(
+        onToggle: toggle,
+        label: panelLabel,
+        rows: panelRows,
+      ),
     );
   }
 }

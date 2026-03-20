@@ -9,7 +9,8 @@ It is designed for inline actions, drawers, search affordances, composer bars, a
 - Declarative API with `isExpanded`
 - Controller-based API with `SpringSurfaceController`
 - Configurable spring tuning via `SpringSurfaceConfig`
-- Support for `top`, `center`, and `bottom` expansion origins
+- 9-point anchors for fixed-size expansion, from `topLeft` to `bottomRight`
+- Legacy `top`, `center`, and `bottom` origins still supported
 - Fixed and measured dynamic expanded sizing
 - Runnable example app under [`example/`](example)
 
@@ -42,7 +43,7 @@ class _DemoCardState extends State<DemoCard> {
       onTap: () => setState(() => _isExpanded = !_isExpanded),
       child: SpringSurface(
         isExpanded: _isExpanded,
-        origin: SpringSurfaceOrigin.bottom,
+        anchor: SpringSurfaceAnchor.bottomCenter,
         config: const SpringSurfaceConfig.gentle(),
         collapsedSize: const Size(220, 52),
         expandedSize: const Size(320, 320),
@@ -84,12 +85,32 @@ Then use:
 ```dart
 SpringSurface.controlled(
   controller: controller,
+  anchor: SpringSurfaceAnchor.centerRight,
   collapsedSize: const Size(220, 52),
   expandedSize: const Size(320, 320),
   collapsedChild: const Text('Compose'),
   expandedChild: const Text('Composer panel'),
 )
 ```
+
+## Anchors
+
+Use `anchor` to keep a specific edge or corner fixed while the surface grows:
+
+```dart
+SpringSurface(
+  isExpanded: _open,
+  anchor: SpringSurfaceAnchor.topRight,
+  collapsedSize: const Size(180, 48),
+  expandedSize: const Size(320, 280),
+  collapsedChild: const Text('Filters'),
+  expandedChild: const Text('Expanded content'),
+)
+```
+
+For `SpringSurfaceExpandedSizing.dynamicHeight`, the horizontal part of the
+anchor is ignored so `topLeft` and `topRight` both behave like `topCenter`,
+and the same applies to the `center` and `bottom` rows.
 
 ## Example app
 

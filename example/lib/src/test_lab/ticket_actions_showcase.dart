@@ -9,48 +9,14 @@ import 'showcase_shared_widgets.dart';
 
 enum _TicketStatus { open, waitingCustomer, escalated }
 
-class TicketActionsDetailExperience extends StatefulWidget {
-  const TicketActionsDetailExperience();
-
-  @override
-  State<TicketActionsDetailExperience> createState() =>
-      TicketActionsDetailExperienceState();
-}
-
-class TicketActionsDetailExperienceState
-    extends State<TicketActionsDetailExperience> {
-  final _sceneKey = GlobalKey<TicketActionsScenarioState>();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _sceneKey.currentState?.open();
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: TicketActionsScenario(
-        key: _sceneKey,
-        presentation: ScenarioPresentation.detail,
-        keyPrefix: 'ticket_actions_detail',
-      ),
-    );
-  }
-}
-
 class TicketActionsScenario extends StatefulWidget {
   const TicketActionsScenario({
     super.key,
-    this.presentation = ScenarioPresentation.compact,
+    this.displayMode = ScenarioDisplayMode.compact,
     this.keyPrefix = 'ticket_actions',
   });
 
-  final ScenarioPresentation presentation;
+  final ScenarioDisplayMode displayMode;
   final String keyPrefix;
 
   @override
@@ -176,7 +142,7 @@ class TicketActionsScenarioState
       builder: (context, constraints) {
         final surfaceWidth = math.min(
           constraints.maxWidth - 80,
-          widget.presentation.isDetail ? 320.0 : 286.0,
+          widget.displayMode.isFeatured ? 320.0 : 286.0,
         );
 
         return DecoratedBox(
@@ -295,10 +261,7 @@ class TicketActionsScenarioState
                               const SizedBox(height: 12),
                               InfoRow(label: 'آخر رد', value: lastReply),
                               const SizedBox(height: 8),
-                              InfoRow(
-                                label: 'المسؤول الحالي',
-                                value: assignee,
-                              ),
+                              InfoRow(label: 'المسؤول الحالي', value: assignee),
                               const SizedBox(height: 12),
                               Container(
                                 width: double.infinity,
@@ -334,7 +297,7 @@ class TicketActionsScenarioState
                 left: 40,
                 right: 40,
                 bottom: 28,
-                height: widget.presentation.isDetail ? 230 : 214,
+                height: widget.displayMode.isFeatured ? 230 : 214,
                 child: SpringSurface(
                   isExpanded: isExpanded,
                   origin: SpringSurfaceOrigin.center,
@@ -342,7 +305,7 @@ class TicketActionsScenarioState
                   collapsedSize: Size(surfaceWidth, 54),
                   expandedSize: Size(
                     surfaceWidth,
-                    widget.presentation.isDetail ? 208 : 194,
+                    widget.displayMode.isFeatured ? 208 : 194,
                   ),
                   collapsedDecoration: BoxDecoration(
                     color: Colors.white,

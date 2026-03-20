@@ -8,8 +8,26 @@ import 'spring_surface_config.dart';
 import 'spring_surface_controller.dart';
 import 'spring_surface_motion.dart';
 
-/// The anchor point from which the surface expands.
+/// Legacy vertical-only anchor for expansion.
+///
+/// Prefer [SpringSurfaceAnchor] for new code.
 enum SpringSurfaceOrigin { center, bottom, top }
+
+/// A 9-point anchor for fixed-size expansion.
+///
+/// For `dynamicHeight`, the horizontal component is collapsed to the center
+/// column so the surface keeps the current vertical-only behavior.
+enum SpringSurfaceAnchor {
+  topLeft,
+  topCenter,
+  topRight,
+  centerLeft,
+  center,
+  centerRight,
+  bottomLeft,
+  bottomCenter,
+  bottomRight,
+}
 
 /// Controls how the expanded surface height is resolved.
 enum SpringSurfaceExpandedSizing {
@@ -26,7 +44,7 @@ enum SpringSurfaceExpandedSizing {
 /// ```dart
 /// SpringSurface(
 ///   isExpanded: _open,
-///   origin: SpringSurfaceOrigin.bottom,
+///   anchor: SpringSurfaceAnchor.bottomCenter,
 ///   collapsedSize: const Size(200, 52),
 ///   expandedSize: const Size(360, 480),
 ///   expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
@@ -39,7 +57,7 @@ enum SpringSurfaceExpandedSizing {
 /// ```dart
 /// SpringSurface.controlled(
 ///   controller: _ctrl,
-///   origin: SpringSurfaceOrigin.center,
+///   anchor: SpringSurfaceAnchor.center,
 ///   collapsedSize: const Size(200, 52),
 ///   expandedSize: const Size(360, 480),
 ///   expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
@@ -55,6 +73,7 @@ class SpringSurface extends StatefulWidget {
     required this.expandedSize,
     required this.collapsedChild,
     required this.expandedChild,
+    this.anchor,
     this.origin = SpringSurfaceOrigin.bottom,
     this.config = const SpringSurfaceConfig(),
     this.expandedSizing = SpringSurfaceExpandedSizing.fixed,
@@ -74,6 +93,7 @@ class SpringSurface extends StatefulWidget {
     required this.expandedSize,
     required this.collapsedChild,
     required this.expandedChild,
+    this.anchor,
     this.origin = SpringSurfaceOrigin.bottom,
     this.expandedSizing = SpringSurfaceExpandedSizing.fixed,
     this.maxExpandedHeight,
@@ -89,6 +109,13 @@ class SpringSurface extends StatefulWidget {
   final bool? isExpanded;
   final SpringSurfaceController? controller;
   final SpringSurfaceConfig config;
+
+  /// Preferred 9-point growth anchor.
+  final SpringSurfaceAnchor? anchor;
+
+  /// Legacy vertical-only expansion shortcut.
+  ///
+  /// When both [anchor] and [origin] are provided, [anchor] wins.
   final SpringSurfaceOrigin origin;
   final SpringSurfaceExpandedSizing expandedSizing;
   final double? maxExpandedHeight;
@@ -122,6 +149,13 @@ class _SpringSurfaceState extends State<SpringSurface>
 
   bool get _usesDynamicExpandedHeight =>
       widget.expandedSizing == SpringSurfaceExpandedSizing.dynamicHeight;
+
+  SpringSurfaceAnchor get _configuredAnchor =>
+      widget.anchor ?? _anchorFromOrigin(widget.origin);
+
+  SpringSurfaceAnchor get _resolvedAnchor => _usesDynamicExpandedHeight
+      ? _normalizeAnchorForDynamicHeight(_configuredAnchor)
+      : _configuredAnchor;
 
   @override
   void initState() {
@@ -218,6 +252,7 @@ class _SpringSurfaceState extends State<SpringSurface>
     final t = _rawController.value;
     final isCollapsing = _rawController.status == AnimationStatus.reverse;
     final cfg = _config;
+    final alignment = _alignmentForAnchor(_resolvedAnchor);
     final targetExpandedHeight = _resolvedExpandedHeight(context, constraints);
     final shouldScrollExpandedContent = _shouldScrollExpandedContent(
       context,
@@ -316,21 +351,6 @@ class _SpringSurfaceState extends State<SpringSurface>
           );
     final contentOffset = (1 - expandedOpacity) * (isCollapsing ? 12.0 : 18.0);
 
-    final Alignment stackAlignment;
-    final AlignmentGeometry childAlignment;
-
-    switch (widget.origin) {
-      case SpringSurfaceOrigin.bottom:
-        stackAlignment = Alignment.bottomCenter;
-        childAlignment = Alignment.bottomCenter;
-      case SpringSurfaceOrigin.top:
-        stackAlignment = Alignment.topCenter;
-        childAlignment = Alignment.topCenter;
-      case SpringSurfaceOrigin.center:
-        stackAlignment = Alignment.center;
-        childAlignment = Alignment.center;
-    }
-
     final surface = SizedBox(
       width: currentW,
       height: currentH,
@@ -366,10 +386,7 @@ class _SpringSurfaceState extends State<SpringSurface>
       ),
     );
 
-    return Align(
-      alignment: stackAlignment,
-      child: Align(alignment: childAlignment, child: surface),
-    );
+    return Align(alignment: alignment, child: surface);
   }
 
   Widget _buildExpandedContent({required bool shouldScroll}) {
@@ -465,6 +482,59 @@ class _SpringSurfaceState extends State<SpringSurface>
     }
     return _measuredExpandedChildHeight! >
         _effectiveMaxExpandedHeight(context, constraints) + _sizeChangeEpsilon;
+  }
+
+  SpringSurfaceAnchor _anchorFromOrigin(SpringSurfaceOrigin origin) {
+    switch (origin) {
+      case SpringSurfaceOrigin.top:
+        return SpringSurfaceAnchor.topCenter;
+      case SpringSurfaceOrigin.center:
+        return SpringSurfaceAnchor.center;
+      case SpringSurfaceOrigin.bottom:
+        return SpringSurfaceAnchor.bottomCenter;
+    }
+  }
+
+  SpringSurfaceAnchor _normalizeAnchorForDynamicHeight(
+    SpringSurfaceAnchor anchor,
+  ) {
+    switch (anchor) {
+      case SpringSurfaceAnchor.topLeft:
+      case SpringSurfaceAnchor.topCenter:
+      case SpringSurfaceAnchor.topRight:
+        return SpringSurfaceAnchor.topCenter;
+      case SpringSurfaceAnchor.centerLeft:
+      case SpringSurfaceAnchor.center:
+      case SpringSurfaceAnchor.centerRight:
+        return SpringSurfaceAnchor.center;
+      case SpringSurfaceAnchor.bottomLeft:
+      case SpringSurfaceAnchor.bottomCenter:
+      case SpringSurfaceAnchor.bottomRight:
+        return SpringSurfaceAnchor.bottomCenter;
+    }
+  }
+
+  Alignment _alignmentForAnchor(SpringSurfaceAnchor anchor) {
+    switch (anchor) {
+      case SpringSurfaceAnchor.topLeft:
+        return Alignment.topLeft;
+      case SpringSurfaceAnchor.topCenter:
+        return Alignment.topCenter;
+      case SpringSurfaceAnchor.topRight:
+        return Alignment.topRight;
+      case SpringSurfaceAnchor.centerLeft:
+        return Alignment.centerLeft;
+      case SpringSurfaceAnchor.center:
+        return Alignment.center;
+      case SpringSurfaceAnchor.centerRight:
+        return Alignment.centerRight;
+      case SpringSurfaceAnchor.bottomLeft:
+        return Alignment.bottomLeft;
+      case SpringSurfaceAnchor.bottomCenter:
+        return Alignment.bottomCenter;
+      case SpringSurfaceAnchor.bottomRight:
+        return Alignment.bottomRight;
+    }
   }
 }
 

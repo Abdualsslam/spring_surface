@@ -33,9 +33,21 @@ class SpringSurfaceMotion {
           )
         : segment(
             progress,
-            begin: isHorizontal ? 0.10 : 0.03,
+            begin: isHorizontal ? 0.10 : 0.05,
             end: isHorizontal ? 0.88 : 0.74,
             curve: Curves.easeOutCubic,
+          );
+
+    final anticipation = isCollapsing
+        ? 0.0
+        : _anticipationPulse(
+            segment(
+              progress,
+              begin: 0.0,
+              end: isHorizontal ? 0.16 : 0.18,
+              curve: Curves.easeOutCubic,
+            ),
+            amplitude: _anticipationAmplitude(axis: axis, config: config),
           );
 
     final stretchProgress = isCollapsing
@@ -54,7 +66,10 @@ class SpringSurfaceMotion {
       config: config,
     );
 
-    return (base + stretch).clamp(0.0, config.overshootClamp);
+    return (base + anticipation + stretch).clamp(
+      isCollapsing ? 0.0 : -0.05,
+      config.overshootClamp,
+    );
   }
 
   static double overshootPulse(
@@ -71,7 +86,15 @@ class SpringSurfaceMotion {
     if (t <= 0) {
       return 1.0;
     }
-    return 1.0 + math.sin(t * math.pi) * amplitude;
+    final main = math.sin(t * math.pi) * amplitude;
+    final settleT = segment(
+      t,
+      begin: 0.58,
+      end: 1.0,
+      curve: Curves.easeOutCubic,
+    );
+    final settle = math.sin(settleT * math.pi) * amplitude * 0.18;
+    return 1.0 + main - settle;
   }
 
   static double bottomEdgeProgress(
@@ -191,6 +214,27 @@ class SpringSurfaceMotion {
     return isHorizontal
         ? -(main * hAmp) - (recoil * hAmp * 0.21)
         : (main * vAmp) + (recoil * vAmp * 0.15);
+  }
+
+  static double _anticipationAmplitude({
+    required SpringSurfaceAxis axis,
+    required SpringSurfaceConfig config,
+  }) {
+    if (axis == SpringSurfaceAxis.horizontal) {
+      return math.min(config.horizontalStretchAmplitude * 0.45, 0.016);
+    }
+    return math.min(config.verticalStretchAmplitude * 0.28, 0.02);
+  }
+
+  static double _anticipationPulse(
+    double progress, {
+    required double amplitude,
+  }) {
+    if (progress <= 0 || progress >= 1 || amplitude <= 0) {
+      return 0.0;
+    }
+    final envelope = math.pow(1 - progress, 1.4).toDouble();
+    return -math.sin(progress * math.pi) * envelope * amplitude;
   }
 
   static double _dampedPulse(double progress, {required double amplitude}) {

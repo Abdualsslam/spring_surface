@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:spring_surface/spring_surface.dart';
 
 import 'showcase_models.dart';
+import 'showcase_shared_widgets.dart';
 
 class PageHero extends StatelessWidget {
   const PageHero({super.key});
@@ -29,7 +31,7 @@ class PageHero extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'سبعة مشاهد واقعية قابلة للتصوير مباشرة.',
+              'ثلاث عائلات سلوكية تجمع ستة أمثلة واقعية في شاشة واحدة.',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.w800,
@@ -37,7 +39,7 @@ class PageHero extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'الصفحة تعرض أمثلة واقعية قصيرة، ويمكن فتح كل مثال في صفحة مستقلة أوسع مع تحكمات تخص السيناريو نفسه.',
+              'كل قسم يركز على نمط تمدد مختلف لـ SpringSurface: من الأعلى، داخل العنصر نفسه، أو من الشريط السفلي.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.white.withAlpha(215),
                 height: 1.5,
@@ -50,14 +52,24 @@ class PageHero extends StatelessWidget {
   }
 }
 
-class ScenarioSection extends StatelessWidget {
-  const ScenarioSection({super.key, required this.definition});
+class FamilySection extends StatelessWidget {
+  const FamilySection({
+    super.key,
+    required this.familyId,
+    required this.title,
+    required this.description,
+    required this.child,
+  });
 
-  final ShowcaseScenarioDefinition definition;
+  final String familyId;
+  final String title;
+  final String description;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
+      key: Key('${familyId}_section'),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(28),
@@ -74,43 +86,22 @@ class ScenarioSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    definition.title,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                OutlinedButton.icon(
-                  key: definition.detailButtonKey,
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => SpringSurfaceScenarioDetailPage(
-                          definition: definition,
-                        ),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.open_in_new_rounded, size: 18),
-                  label: const Text('تجربة في صفحة'),
-                ),
-              ],
+            Text(
+              title,
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 8),
             Text(
-              definition.description,
+              description,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.black54,
                 height: 1.5,
               ),
             ),
             const SizedBox(height: 18),
-            PreviewFrame(child: definition.compactPreviewBuilder()),
+            child,
           ],
         ),
       ),
@@ -118,29 +109,277 @@ class ScenarioSection extends StatelessWidget {
   }
 }
 
-class SpringSurfaceScenarioDetailPage extends StatelessWidget {
-  const SpringSurfaceScenarioDetailPage({super.key, required this.definition});
+class VariantSwitcher extends StatelessWidget {
+  const VariantSwitcher({
+    super.key,
+    required this.familyId,
+    required this.variants,
+    required this.activeVariantId,
+    required this.onVariantSelected,
+  });
 
-  final ShowcaseScenarioDefinition definition;
+  final String familyId;
+  final List<ShowcaseVariantDefinition> variants;
+  final String activeVariantId;
+  final ValueChanged<String> onVariantSelected;
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.transparent,
-          title: Text(definition.title),
-        ),
-        body: SafeArea(
-          child: KeyedSubtree(
-            key: definition.detailPageKey,
-            child: definition.detailExperienceBuilder(),
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        for (final variant in variants)
+          _VariantChip(
+            key: Key('${familyId}_variant_${variant.id}'),
+            label: variant.title,
+            selected: variant.id == activeVariantId,
+            onTap: () => onVariantSelected(variant.id),
+          ),
+      ],
+    );
+  }
+}
+
+class _VariantChip extends StatelessWidget {
+  const _VariantChip({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xFF0F172A) : const Color(0xFFF5F7FB),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: selected
+                  ? const Color(0xFF0F172A)
+                  : const Color(0xFFE2E8F0),
+            ),
+          ),
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: selected ? Colors.white : const Color(0xFF0F172A),
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class FeaturedScenarioFrame extends StatelessWidget {
+  const FeaturedScenarioFrame({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return PreviewFrame(child: child);
+  }
+}
+
+class CompactScenarioCard extends StatelessWidget {
+  const CompactScenarioCard({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.child,
+  });
+
+  final String title;
+  final String description;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              description,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.black54,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            PreviewFrame(child: child),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class BottomDockScenarioShell extends StatelessWidget {
+  const BottomDockScenarioShell({
+    super.key,
+    required this.keyPrefix,
+    required this.displayMode,
+    required this.isExpanded,
+    required this.onToggle,
+    required this.onClose,
+    required this.accent,
+    required this.gradient,
+    required this.title,
+    required this.badgeLabel,
+    required this.surfaceConfig,
+    required this.collapsedHeight,
+    required this.expandedHeightCompact,
+    required this.expandedHeightFeatured,
+    required this.surfaceHostHeightCompact,
+    required this.surfaceHostHeightFeatured,
+    required this.backgroundBuilder,
+    required this.collapsedChild,
+    required this.expandedChild,
+  });
+
+  final String keyPrefix;
+  final ScenarioDisplayMode displayMode;
+  final bool isExpanded;
+  final VoidCallback onToggle;
+  final VoidCallback onClose;
+  final Color accent;
+  final Gradient gradient;
+  final String title;
+  final String badgeLabel;
+  final SpringSurfaceConfig surfaceConfig;
+  final double collapsedHeight;
+  final double expandedHeightCompact;
+  final double expandedHeightFeatured;
+  final double surfaceHostHeightCompact;
+  final double surfaceHostHeightFeatured;
+  final WidgetBuilder backgroundBuilder;
+  final Widget collapsedChild;
+  final Widget expandedChild;
+
+  @override
+  Widget build(BuildContext context) {
+    final surfaceHostHeight = displayMode.isFeatured
+        ? surfaceHostHeightFeatured
+        : surfaceHostHeightCompact;
+    final expandedHeight = displayMode.isFeatured
+        ? expandedHeightFeatured
+        : expandedHeightCompact;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final surfaceWidth = constraints.maxWidth - 32;
+
+        return DecoratedBox(
+          key: Key('${keyPrefix}_canvas'),
+          decoration: BoxDecoration(gradient: gradient),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                          ShowcaseBadge(label: badgeLabel),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Expanded(child: backgroundBuilder(context)),
+                    ],
+                  ),
+                ),
+              ),
+              if (isExpanded)
+                ScenarioBackdrop(
+                  backdropKey: Key('${keyPrefix}_backdrop'),
+                  onTap: onClose,
+                ),
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: 16,
+                height: surfaceHostHeight,
+                child: SpringSurface(
+                  isExpanded: isExpanded,
+                  origin: SpringSurfaceOrigin.bottom,
+                  config: surfaceConfig,
+                  collapsedSize: Size(surfaceWidth, collapsedHeight),
+                  expandedSize: Size(surfaceWidth, expandedHeight),
+                  collapsedDecoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: accent.withAlpha(34)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x12000000),
+                        blurRadius: 22,
+                        offset: Offset(0, 12),
+                      ),
+                    ],
+                  ),
+                  expandedDecoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: accent.withAlpha(36)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x14000000),
+                        blurRadius: 28,
+                        offset: Offset(0, 14),
+                      ),
+                    ],
+                  ),
+                  collapsedChild: GestureDetector(
+                    key: Key('${keyPrefix}_toggle'),
+                    behavior: HitTestBehavior.opaque,
+                    onTap: onToggle,
+                    child: collapsedChild,
+                  ),
+                  expandedChild: expandedChild,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
