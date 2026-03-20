@@ -26,12 +26,49 @@ class MessageComposerScenario extends StatefulWidget {
 
 class MessageComposerScenarioState
     extends ExpandableSceneState<MessageComposerScenario> {
+  late final TextEditingController _draftController;
+  late final FocusNode _draftFocusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _draftController = TextEditingController(
+      text: _initialDraftFor(_ComposerMode.file),
+    );
+    _draftFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _draftController.dispose();
+    _draftFocusNode.dispose();
+    super.dispose();
+  }
+
+  String _initialDraftFor(_ComposerMode mode) {
+    switch (mode) {
+      case _ComposerMode.file:
+        return 'أرفق ملف المراجعة النهائية';
+      case _ComposerMode.image:
+        return 'أرفق صورة مرجعية للواجهة';
+      case _ComposerMode.voice:
+        return 'سجل ملاحظة صوتية مختصرة';
+    }
+  }
+
+  void _expandComposer() {
+    if (isExpanded) {
+      return;
+    }
+    _draftFocusNode.unfocus();
+    toggle();
+  }
+
   @override
   Widget build(BuildContext context) {
     const accent = Color(0xFF039855);
     const currentComposerMode = _ComposerMode.file;
 
-    late final String placeholder;
     late final String bubbleOne;
     late final String bubbleThree;
     late final String panelLabel;
@@ -39,7 +76,6 @@ class MessageComposerScenarioState
 
     switch (currentComposerMode) {
       case _ComposerMode.file:
-        placeholder = 'أرفق ملف المراجعة النهائية';
         bubbleOne = 'هل نرسل النسخة المختصرة الآن أم بعد المراجعة الأخيرة؟';
         bubbleThree = 'ممتاز، سأرفق ملف النقاط الرئيسية أيضاً.';
         panelLabel = 'إرفاق سريع';
@@ -67,7 +103,6 @@ class MessageComposerScenarioState
           ),
         ];
       case _ComposerMode.image:
-        placeholder = 'أرفق صورة مرجعية للواجهة';
         bubbleOne = 'نحتاج لقطة الشاشة الأخيرة قبل إرسال التوضيح للعميل.';
         bubbleThree = 'سأرفق صورة مرجعية مع تمييز الجزء المطلوب.';
         panelLabel = 'إرسال صورة';
@@ -95,7 +130,6 @@ class MessageComposerScenarioState
           ),
         ];
       case _ComposerMode.voice:
-        placeholder = 'سجل ملاحظة صوتية مختصرة';
         bubbleOne = 'هل نكتفي بتحديث مكتوب أم نرسل شرحاً صوتياً للفريق؟';
         bubbleThree = 'سأضيف ملاحظة صوتية قصيرة مع أهم النقاط.';
         panelLabel = 'ملاحظة صوتية';
@@ -140,10 +174,11 @@ class MessageComposerScenarioState
       badgeLabel: 'متصل الآن',
       surfaceConfig: const SpringSurfaceConfig.gentle(),
       collapsedHeight: 52,
-      expandedHeightCompact: 184,
-      expandedHeightFeatured: 196,
-      surfaceHostHeightCompact: 214,
-      surfaceHostHeightFeatured: 230,
+      expandedHeightCompact: 196,
+      expandedHeightFeatured: 208,
+      surfaceHostHeightCompact: 226,
+      surfaceHostHeightFeatured: 242,
+      wrapCollapsedChildWithToggle: false,
       backgroundBuilder: (context) {
         return Column(
           children: [
@@ -160,11 +195,21 @@ class MessageComposerScenarioState
           ],
         );
       },
-      collapsedChild: ComposerBar(placeholder: placeholder, accent: accent),
+      collapsedChild: ComposerBar(
+        placeholder: 'اكتب رسالة أو أضف مرفقاً',
+        accent: accent,
+        controller: _draftController,
+        focusNode: _draftFocusNode,
+        onExpandTap: _expandComposer,
+        inputFieldKey: Key('${widget.keyPrefix}_input_field'),
+        expandButtonKey: Key('${widget.keyPrefix}_expand_button'),
+      ),
       expandedChild: _MessageComposerPanel(
         onToggle: toggle,
         label: panelLabel,
         rows: panelRows,
+        draftController: _draftController,
+        draftPreviewKey: Key('${widget.keyPrefix}_draft_preview'),
       ),
     );
   }
@@ -175,11 +220,15 @@ class _MessageComposerPanel extends StatelessWidget {
     required this.onToggle,
     required this.label,
     required this.rows,
+    required this.draftController,
+    required this.draftPreviewKey,
   });
 
   final VoidCallback onToggle;
   final String label;
   final List<Widget> rows;
+  final TextEditingController draftController;
+  final Key draftPreviewKey;
 
   @override
   Widget build(BuildContext context) {
@@ -193,6 +242,13 @@ class _MessageComposerPanel extends StatelessWidget {
             icon: Icons.attach_file_rounded,
             accent: const Color(0xFF039855),
           ),
+        ),
+        const SizedBox(height: 12),
+        ComposerDraftCard(
+          cardKey: draftPreviewKey,
+          controller: draftController,
+          label: 'المسودة الحالية',
+          emptyLabel: 'ابدأ بكتابة الرسالة من الشريط السفلي.',
         ),
         const SizedBox(height: 12),
         ...rows,

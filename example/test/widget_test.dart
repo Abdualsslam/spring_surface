@@ -318,13 +318,13 @@ void main() {
 
     await _bringFinderIntoComfortableView(
       tester,
-      find.byKey(const Key('bottom_dock_message_composer_toggle')),
+      find.byKey(const Key('bottom_dock_message_composer_expand_button')),
     );
 
-    final composerToggle = find.byKey(
-      const Key('bottom_dock_message_composer_toggle'),
+    final composerExpandButton = find.byKey(
+      const Key('bottom_dock_message_composer_expand_button'),
     );
-    await tester.tap(composerToggle);
+    await tester.tap(composerExpandButton.hitTestable());
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 150));
     await tester.pumpAndSettle();
@@ -350,7 +350,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.byKey(const Key('bottom_dock_message_composer_toggle')),
+      find.byKey(const Key('bottom_dock_message_composer_expand_button')),
       findsNothing,
     );
 
@@ -370,6 +370,60 @@ void main() {
     await _tapBackdropAtSafeSpot(tester, checkoutBackdrop);
     expect(checkoutBackdrop, findsNothing);
   });
+
+  testWidgets(
+    'Message composer field stays interactive and expands only from plus',
+    (WidgetTester tester) async {
+      await _openTestLab(tester);
+
+      final inputField = find.byKey(
+        const Key('bottom_dock_message_composer_input_field'),
+      );
+      final expandButton = find.byKey(
+        const Key('bottom_dock_message_composer_expand_button'),
+      );
+      const updatedDraft = 'أرسل النسخة النهائية الليلة';
+
+      await _bringFinderIntoComfortableView(tester, inputField);
+
+      await tester.tap(inputField);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('bottom_dock_message_composer_backdrop')),
+        findsNothing,
+      );
+
+      await tester.enterText(inputField, updatedDraft);
+      await tester.pumpAndSettle();
+      expect(_textFieldValue(tester, inputField), updatedDraft);
+      expect(
+        find.byKey(const Key('bottom_dock_message_composer_backdrop')),
+        findsNothing,
+      );
+
+      await tester.tap(expandButton.hitTestable());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 150));
+      await tester.pumpAndSettle();
+
+      final backdrop = find.byKey(
+        const Key('bottom_dock_message_composer_backdrop'),
+      );
+      final draftPreview = find.byKey(
+        const Key('bottom_dock_message_composer_draft_preview'),
+      );
+      expect(backdrop, findsOneWidget);
+      expect(
+        find.descendant(of: draftPreview, matching: find.text(updatedDraft)),
+        findsOneWidget,
+      );
+
+      await _tapBackdropAtSafeSpot(tester, backdrop);
+
+      expect(_textFieldValue(tester, inputField), updatedDraft);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets(
     'Booking slot merged scene shows filter and quick booking surfaces',
@@ -651,7 +705,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Unified showcase bottom composer opens and closes', (
+  testWidgets('Unified showcase bottom composer edits and opens from plus', (
     WidgetTester tester,
   ) async {
     await _openUnifiedShowcase(tester);
@@ -664,13 +718,30 @@ void main() {
       tester,
       find.byKey(const Key('unified_showcase_bottom_zone')),
     );
-    final toggle = find.byKey(
-      const Key('unified_showcase_bottom_composer_toggle'),
+    final inputField = find.byKey(
+      const Key('unified_showcase_bottom_composer_input_field'),
     );
-    expect(toggle, findsOneWidget);
-    await tester.ensureVisible(toggle);
+    final expandButton = find.byKey(
+      const Key('unified_showcase_bottom_composer_expand_button'),
+    );
+    const updatedDraft = 'Send the final review file tonight';
+
+    expect(inputField, findsOneWidget);
+    await tester.ensureVisible(inputField);
     await tester.pumpAndSettle();
-    await tester.tap(toggle.hitTestable());
+
+    await tester.tap(inputField);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('unified_showcase_bottom_composer_backdrop')),
+      findsNothing,
+    );
+
+    await tester.enterText(inputField, updatedDraft);
+    await tester.pumpAndSettle();
+    expect(_textFieldValue(tester, inputField), updatedDraft);
+
+    await tester.tap(expandButton.hitTestable());
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 150));
     await tester.pumpAndSettle();
@@ -678,10 +749,18 @@ void main() {
     final backdrop = find.byKey(
       const Key('unified_showcase_bottom_composer_backdrop'),
     );
+    final draftPreview = find.byKey(
+      const Key('unified_showcase_bottom_composer_draft_preview'),
+    );
     expect(backdrop, findsOneWidget);
+    expect(
+      find.descendant(of: draftPreview, matching: find.text(updatedDraft)),
+      findsOneWidget,
+    );
 
     await _tapFilterBackdropAtSafeSpot(tester, backdrop);
 
+    expect(_textFieldValue(tester, inputField), updatedDraft);
     expect(backdrop, findsNothing);
     expect(tester.takeException(), isNull);
   });
@@ -820,4 +899,9 @@ Finder _unifiedShowcasePageScrollable() {
         matching: find.byType(Scrollable),
       )
       .first;
+}
+
+String _textFieldValue(WidgetTester tester, Finder finder) {
+  final field = tester.widget<TextField>(finder);
+  return field.controller?.text ?? '';
 }

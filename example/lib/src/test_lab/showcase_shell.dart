@@ -265,6 +265,7 @@ class BottomDockScenarioShell extends StatelessWidget {
     required this.backgroundBuilder,
     required this.collapsedChild,
     required this.expandedChild,
+    this.wrapCollapsedChildWithToggle = true,
   });
 
   final String keyPrefix;
@@ -285,6 +286,7 @@ class BottomDockScenarioShell extends StatelessWidget {
   final WidgetBuilder backgroundBuilder;
   final Widget collapsedChild;
   final Widget expandedChild;
+  final bool wrapCollapsedChildWithToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -367,12 +369,14 @@ class BottomDockScenarioShell extends StatelessWidget {
                       ),
                     ],
                   ),
-                  collapsedChild: GestureDetector(
-                    key: Key('${keyPrefix}_toggle'),
-                    behavior: HitTestBehavior.opaque,
-                    onTap: onToggle,
-                    child: collapsedChild,
-                  ),
+                  collapsedChild: wrapCollapsedChildWithToggle
+                      ? GestureDetector(
+                          key: Key('${keyPrefix}_toggle'),
+                          behavior: HitTestBehavior.opaque,
+                          onTap: onToggle,
+                          child: collapsedChild,
+                        )
+                      : collapsedChild,
                   expandedChild: expandedChild,
                 ),
               ),

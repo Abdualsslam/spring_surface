@@ -790,9 +790,31 @@ class _UnifiedMiddleZoneState extends State<_UnifiedMiddleZone> {
 
 class _UnifiedBottomZoneState extends State<_UnifiedBottomZone> {
   bool _isExpanded = false;
+  late final TextEditingController _draftController;
+  late final FocusNode _draftFocusNode;
 
-  void _toggleComposer() {
-    setState(() => _isExpanded = !_isExpanded);
+  @override
+  void initState() {
+    super.initState();
+    _draftController = TextEditingController(
+      text: 'Attach the final review file',
+    );
+    _draftFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _draftController.dispose();
+    _draftFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _expandComposer() {
+    if (_isExpanded) {
+      return;
+    }
+    _draftFocusNode.unfocus();
+    setState(() => _isExpanded = true);
   }
 
   void _closeComposer() {
@@ -873,18 +895,23 @@ class _UnifiedBottomZoneState extends State<_UnifiedBottomZone> {
                 expandedSize: const Size(320, 194),
                 collapsedDecoration: _collapsedDecoration(bottomAccent),
                 expandedDecoration: _expandedDecoration(bottomAccent),
-                collapsedChild: GestureDetector(
-                  key: const Key('unified_showcase_bottom_composer_toggle'),
-                  behavior: HitTestBehavior.opaque,
-                  onTap: _toggleComposer,
-                  child: const ComposerBar(
-                    placeholder: 'Reply, attach, or start a task',
-                    accent: bottomAccent,
+                collapsedChild: ComposerBar(
+                  placeholder: 'Reply, attach, or start a task',
+                  accent: bottomAccent,
+                  controller: _draftController,
+                  focusNode: _draftFocusNode,
+                  onExpandTap: _expandComposer,
+                  inputFieldKey: const Key(
+                    'unified_showcase_bottom_composer_input_field',
+                  ),
+                  expandButtonKey: const Key(
+                    'unified_showcase_bottom_composer_expand_button',
                   ),
                 ),
                 expandedChild: _BottomComposerPanel(
                   onClose: _closeComposer,
                   accent: bottomAccent,
+                  draftController: _draftController,
                 ),
               ),
             ),
@@ -1148,10 +1175,15 @@ class _AvailabilityDetailPanel extends StatelessWidget {
 }
 
 class _BottomComposerPanel extends StatelessWidget {
-  const _BottomComposerPanel({required this.onClose, required this.accent});
+  const _BottomComposerPanel({
+    required this.onClose,
+    required this.accent,
+    required this.draftController,
+  });
 
   final VoidCallback onClose;
   final Color accent;
+  final TextEditingController draftController;
 
   @override
   Widget build(BuildContext context) {
@@ -1167,6 +1199,13 @@ class _BottomComposerPanel extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
+        ComposerDraftCard(
+          cardKey: const Key('unified_showcase_bottom_composer_draft_preview'),
+          controller: draftController,
+          label: 'Draft in progress',
+          emptyLabel: 'Type a reply from the bottom dock.',
+        ),
+        const SizedBox(height: 10),
         Row(
           children: const [
             Expanded(
@@ -1190,8 +1229,6 @@ class _BottomComposerPanel extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         const InfoRow(label: 'Channel', value: 'Care team thread'),
-        const SizedBox(height: 8),
-        const InfoRow(label: 'Draft', value: 'Ready to send'),
       ],
     );
   }

@@ -94,6 +94,34 @@ SpringSurface.controlled(
 )
 ```
 
+## Partial Triggers
+
+`SpringSurface` does not require the whole `collapsedChild` to open the panel.
+Keep the collapsed content interactive, then wire expansion only to the
+sub-widget that should trigger it.
+
+```dart
+SpringSurface.controlled(
+  controller: controller,
+  anchor: SpringSurfaceAnchor.bottomCenter,
+  collapsedSize: const Size(320, 56),
+  expandedSize: const Size(320, 220),
+  collapsedChild: Row(
+    children: [
+      Expanded(child: TextField(controller: draftController)),
+      IconButton(
+        onPressed: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          controller.expand();
+        },
+        icon: const Icon(Icons.add_rounded),
+      ),
+    ],
+  ),
+  expandedChild: const Text('Composer actions'),
+)
+```
+
 ## Anchors
 
 Use `anchor` to keep a specific edge or corner fixed while the surface grows:

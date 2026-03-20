@@ -303,51 +303,137 @@ class SettingsRowTrigger extends StatelessWidget {
 }
 
 class ComposerBar extends StatelessWidget {
-  const ComposerBar({required this.placeholder, required this.accent});
+  const ComposerBar({
+    required this.placeholder,
+    required this.accent,
+    required this.controller,
+    required this.focusNode,
+    required this.onExpandTap,
+    this.inputFieldKey,
+    this.expandButtonKey,
+  });
 
   final String placeholder;
   final Color accent;
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final VoidCallback onExpandTap;
+  final Key? inputFieldKey;
+  final Key? expandButtonKey;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Row(
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: accent.withAlpha(18),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(Icons.add_rounded, color: accent),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Container(
-              height: 38,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF6F8FB),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              alignment: Alignment.centerRight,
-              child: Text(
-                placeholder,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: Colors.black45),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          children: [
+            GestureDetector(
+              key: expandButtonKey,
+              behavior: HitTestBehavior.opaque,
+              onTap: onExpandTap,
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: accent.withAlpha(18),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.add_rounded, color: accent),
               ),
             ),
-          ),
-          const SizedBox(width: 10),
-          Icon(Icons.mic_none_rounded, color: accent),
-        ],
+            const SizedBox(width: 10),
+            Expanded(
+              child: Container(
+                height: 38,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF6F8FB),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                alignment: Alignment.centerRight,
+                child: TextField(
+                  key: inputFieldKey,
+                  controller: controller,
+                  focusNode: focusNode,
+                  maxLines: 1,
+                  textInputAction: TextInputAction.done,
+                  decoration: InputDecoration(
+                    hintText: placeholder,
+                    hintStyle: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: Colors.black45),
+                    border: InputBorder.none,
+                    isCollapsed: true,
+                  ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Icon(Icons.mic_none_rounded, color: accent),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class ComposerDraftCard extends StatelessWidget {
+  const ComposerDraftCard({
+    required this.controller,
+    required this.label,
+    required this.emptyLabel,
+    this.cardKey,
+  });
+
+  final TextEditingController controller;
+  final String label;
+  final String emptyLabel;
+  final Key? cardKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<TextEditingValue>(
+      valueListenable: controller,
+      builder: (context, value, _) {
+        final draft = value.text.trim();
+
+        return Container(
+          key: cardKey,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF6F8FB),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                draft.isEmpty ? emptyLabel : draft,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.black87,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
