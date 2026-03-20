@@ -5,6 +5,8 @@ import 'package:spring_surface/spring_surface.dart';
 const Key _hostKey = Key('host');
 const Size _collapsedSize = Size(100, 40);
 const Size _expandedSize = Size(220, 260);
+const Size _actionCollapsedSize = Size(220, 56);
+const Size _actionExpandedSize = Size(220, 180);
 const SpringSurfaceConfig _fastConfig = SpringSurfaceConfig(
   expandDuration: Duration(milliseconds: 40),
   collapseDuration: Duration(milliseconds: 40),
@@ -290,6 +292,86 @@ void main() {
     expect(collapsedCount, 1);
   });
 
+  testWidgets('SpringSurfaceActions.maybeOf returns null outside scope', (
+    WidgetTester tester,
+  ) async {
+    SpringSurfaceActions? actions;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) {
+              actions = SpringSurfaceActions.maybeOf(context);
+              return const SizedBox();
+            },
+          ),
+        ),
+      ),
+    );
+
+    expect(actions, isNull);
+  });
+
+  testWidgets('SpringSurfaceActions.of throws a clear error outside scope', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) {
+              SpringSurfaceActions.of(context);
+              return const SizedBox();
+            },
+          ),
+        ),
+      ),
+    );
+
+    final exception = tester.takeException();
+    expect(exception, isA<FlutterError>());
+    expect(exception.toString(), contains('SpringSurface.controlled'));
+  });
+
+  testWidgets('controlled descendants can expand, collapse, and toggle', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const _ControlledActionsHarness());
+
+    expect(
+      _surfaceSize(tester).height,
+      closeTo(_actionCollapsedSize.height, 0.01),
+    );
+
+    await tester.tap(find.byKey(const Key('actions_expand')));
+    await tester.pumpAndSettle();
+
+    expect(
+      _surfaceSize(tester).height,
+      closeTo(_actionExpandedSize.height, 0.01),
+    );
+    expect(find.text('expanded'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('actions_collapse')));
+    await tester.pumpAndSettle();
+
+    expect(
+      _surfaceSize(tester).height,
+      closeTo(_actionCollapsedSize.height, 0.01),
+    );
+
+    await tester.tap(find.byKey(const Key('actions_expand')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('actions_toggle')));
+    await tester.pumpAndSettle();
+
+    expect(
+      _surfaceSize(tester).height,
+      closeTo(_actionCollapsedSize.height, 0.01),
+    );
+  });
+
   testWidgets('ready surfaces still require expanded content and size', (
     WidgetTester tester,
   ) async {
@@ -387,6 +469,31 @@ void main() {
     expect(controller.isPulsing, isFalse);
     expect(_surfaceSize(tester).width, closeTo(_collapsedSize.width, 0.01));
   });
+
+  testWidgets('controlled descendants can pulse without expanding', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const _ControlledPulseActionsHarness());
+
+    expect(
+      _surfaceSize(tester).width,
+      closeTo(_actionCollapsedSize.width, 0.01),
+    );
+
+    await tester.tap(find.byKey(const Key('actions_pulse')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 45));
+
+    expect(_surfaceSize(tester).width, greaterThan(_actionCollapsedSize.width));
+
+    await tester.pumpAndSettle();
+
+    expect(
+      _surfaceSize(tester).width,
+      closeTo(_actionCollapsedSize.width, 0.01),
+    );
+    expect(find.byType(SingleChildScrollView), findsNothing);
+  });
 }
 
 class _ControlledPulseHarness extends StatefulWidget {
@@ -425,6 +532,129 @@ class _ControlledPulseHarnessState extends State<_ControlledPulseHarness>
         collapsedSize: _collapsedSize,
         collapsedChild: const Text('Pulse'),
       ),
+    );
+  }
+}
+
+class _ControlledActionsHarness extends StatefulWidget {
+  const _ControlledActionsHarness();
+
+  @override
+  State<_ControlledActionsHarness> createState() =>
+      _ControlledActionsHarnessState();
+}
+
+class _ControlledActionsHarnessState extends State<_ControlledActionsHarness>
+    with SingleTickerProviderStateMixin {
+  late final SpringSurfaceController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = SpringSurfaceController(vsync: this, config: _fastConfig);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildHarness(
+      SpringSurface.controlled(
+        controller: _controller,
+        collapsedSize: _actionCollapsedSize,
+        expandedSize: _actionExpandedSize,
+        collapsedChild: Builder(
+          builder: (context) {
+            return Center(
+              child: TextButton(
+                key: const Key('actions_expand'),
+                onPressed: () => SpringSurfaceActions.of(context).expand(),
+                child: const Text('Expand'),
+              ),
+            );
+          },
+        ),
+        expandedChild: Builder(
+          builder: (context) {
+            final actions = SpringSurfaceActions.of(context);
+
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(actions.isExpanded ? 'expanded' : 'collapsed'),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    key: const Key('actions_collapse'),
+                    onPressed: () => actions.collapse(),
+                    child: const Text('Collapse'),
+                  ),
+                  TextButton(
+                    key: const Key('actions_toggle'),
+                    onPressed: () => actions.toggle(),
+                    child: const Text('Toggle'),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+      hostSize: const Size(320, 320),
+    );
+  }
+}
+
+class _ControlledPulseActionsHarness extends StatefulWidget {
+  const _ControlledPulseActionsHarness();
+
+  @override
+  State<_ControlledPulseActionsHarness> createState() =>
+      _ControlledPulseActionsHarnessState();
+}
+
+class _ControlledPulseActionsHarnessState
+    extends State<_ControlledPulseActionsHarness>
+    with SingleTickerProviderStateMixin {
+  late final SpringSurfaceController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = SpringSurfaceController(vsync: this, config: _fastConfig);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildHarness(
+      SpringSurface.controlled(
+        controller: _controller,
+        contentState: SpringSurfaceContentState.pending,
+        collapsedSize: _actionCollapsedSize,
+        collapsedChild: Builder(
+          builder: (context) {
+            return Center(
+              child: TextButton(
+                key: const Key('actions_pulse'),
+                onPressed: () => SpringSurfaceActions.of(context).pulse(),
+                child: const Text('Pulse'),
+              ),
+            );
+          },
+        ),
+      ),
+      hostSize: const Size(320, 320),
     );
   }
 }

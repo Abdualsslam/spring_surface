@@ -266,6 +266,7 @@ class BottomDockScenarioShell extends StatelessWidget {
     required this.collapsedChild,
     required this.expandedChild,
     this.wrapCollapsedChildWithToggle = true,
+    this.surfaceController,
   });
 
   final String keyPrefix;
@@ -287,6 +288,7 @@ class BottomDockScenarioShell extends StatelessWidget {
   final Widget collapsedChild;
   final Widget expandedChild;
   final bool wrapCollapsedChildWithToggle;
+  final SpringSurfaceController? surfaceController;
 
   @override
   Widget build(BuildContext context) {
@@ -300,11 +302,10 @@ class BottomDockScenarioShell extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final surfaceWidth = constraints.maxWidth - 32;
+        final controlledSurface = surfaceController != null;
 
-        return DecoratedBox(
-          key: Key('${keyPrefix}_canvas'),
-          decoration: BoxDecoration(gradient: gradient),
-          child: Stack(
+        Widget buildScene(bool expanded) {
+          return Stack(
             children: [
               Positioned.fill(
                 child: Padding(
@@ -329,7 +330,7 @@ class BottomDockScenarioShell extends StatelessWidget {
                   ),
                 ),
               ),
-              if (isExpanded)
+              if (expanded)
                 ScenarioBackdrop(
                   backdropKey: Key('${keyPrefix}_backdrop'),
                   onTap: onClose,
@@ -339,49 +340,102 @@ class BottomDockScenarioShell extends StatelessWidget {
                 right: 16,
                 bottom: 16,
                 height: surfaceHostHeight,
-                child: SpringSurface(
-                  isExpanded: isExpanded,
-                  origin: SpringSurfaceOrigin.bottom,
-                  config: surfaceConfig,
-                  collapsedSize: Size(surfaceWidth, collapsedHeight),
-                  expandedSize: Size(surfaceWidth, expandedHeight),
-                  collapsedDecoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: accent.withAlpha(34)),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x12000000),
-                        blurRadius: 22,
-                        offset: Offset(0, 12),
+                child: controlledSurface
+                    ? SpringSurface.controlled(
+                        controller: surfaceController!,
+                        origin: SpringSurfaceOrigin.bottom,
+                        collapsedSize: Size(surfaceWidth, collapsedHeight),
+                        expandedSize: Size(surfaceWidth, expandedHeight),
+                        collapsedDecoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: accent.withAlpha(34)),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x12000000),
+                              blurRadius: 22,
+                              offset: Offset(0, 12),
+                            ),
+                          ],
+                        ),
+                        expandedDecoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: accent.withAlpha(36)),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x14000000),
+                              blurRadius: 28,
+                              offset: Offset(0, 14),
+                            ),
+                          ],
+                        ),
+                        collapsedChild: wrapCollapsedChildWithToggle
+                            ? GestureDetector(
+                                key: Key('${keyPrefix}_toggle'),
+                                behavior: HitTestBehavior.opaque,
+                                onTap: onToggle,
+                                child: collapsedChild,
+                              )
+                            : collapsedChild,
+                        expandedChild: expandedChild,
+                      )
+                    : SpringSurface(
+                        isExpanded: expanded,
+                        origin: SpringSurfaceOrigin.bottom,
+                        config: surfaceConfig,
+                        collapsedSize: Size(surfaceWidth, collapsedHeight),
+                        expandedSize: Size(surfaceWidth, expandedHeight),
+                        collapsedDecoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: accent.withAlpha(34)),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x12000000),
+                              blurRadius: 22,
+                              offset: Offset(0, 12),
+                            ),
+                          ],
+                        ),
+                        expandedDecoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: accent.withAlpha(36)),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x14000000),
+                              blurRadius: 28,
+                              offset: Offset(0, 14),
+                            ),
+                          ],
+                        ),
+                        collapsedChild: wrapCollapsedChildWithToggle
+                            ? GestureDetector(
+                                key: Key('${keyPrefix}_toggle'),
+                                behavior: HitTestBehavior.opaque,
+                                onTap: onToggle,
+                                child: collapsedChild,
+                              )
+                            : collapsedChild,
+                        expandedChild: expandedChild,
                       ),
-                    ],
-                  ),
-                  expandedDecoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: accent.withAlpha(36)),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x14000000),
-                        blurRadius: 28,
-                        offset: Offset(0, 14),
-                      ),
-                    ],
-                  ),
-                  collapsedChild: wrapCollapsedChildWithToggle
-                      ? GestureDetector(
-                          key: Key('${keyPrefix}_toggle'),
-                          behavior: HitTestBehavior.opaque,
-                          onTap: onToggle,
-                          child: collapsedChild,
-                        )
-                      : collapsedChild,
-                  expandedChild: expandedChild,
-                ),
               ),
             ],
-          ),
+          );
+        }
+
+        return DecoratedBox(
+          key: Key('${keyPrefix}_canvas'),
+          decoration: BoxDecoration(gradient: gradient),
+          child: controlledSurface
+              ? ListenableBuilder(
+                  listenable: surfaceController!,
+                  builder: (context, _) {
+                    return buildScene(surfaceController!.isExpanded);
+                  },
+                )
+              : buildScene(isExpanded),
         );
       },
     );

@@ -96,9 +96,9 @@ SpringSurface.controlled(
 
 ## Partial Triggers
 
-`SpringSurface` does not require the whole `collapsedChild` to open the panel.
-Keep the collapsed content interactive, then wire expansion only to the
-sub-widget that should trigger it.
+`SpringSurface.controlled` injects `SpringSurfaceActions` around its collapsed
+and expanded content. That lets any descendant open, close, toggle, or pulse
+the surface without turning the whole `collapsedChild` into one large button.
 
 ```dart
 SpringSurface.controlled(
@@ -106,17 +106,19 @@ SpringSurface.controlled(
   anchor: SpringSurfaceAnchor.bottomCenter,
   collapsedSize: const Size(320, 56),
   expandedSize: const Size(320, 220),
-  collapsedChild: Row(
-    children: [
-      Expanded(child: TextField(controller: draftController)),
-      IconButton(
-        onPressed: () {
-          FocusManager.instance.primaryFocus?.unfocus();
-          controller.expand();
-        },
-        icon: const Icon(Icons.add_rounded),
-      ),
-    ],
+  collapsedChild: Builder(
+    builder: (context) => Row(
+      children: [
+        Expanded(child: TextField(controller: draftController)),
+        IconButton(
+          onPressed: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+            SpringSurfaceActions.of(context).expand();
+          },
+          icon: const Icon(Icons.add_rounded),
+        ),
+      ],
+    ),
   ),
   expandedChild: const Text('Composer actions'),
 )

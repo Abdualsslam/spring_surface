@@ -788,10 +788,11 @@ class _UnifiedMiddleZoneState extends State<_UnifiedMiddleZone> {
   }
 }
 
-class _UnifiedBottomZoneState extends State<_UnifiedBottomZone> {
-  bool _isExpanded = false;
+class _UnifiedBottomZoneState extends State<_UnifiedBottomZone>
+    with SingleTickerProviderStateMixin {
   late final TextEditingController _draftController;
   late final FocusNode _draftFocusNode;
+  late final SpringSurfaceController _surfaceController;
 
   @override
   void initState() {
@@ -800,28 +801,23 @@ class _UnifiedBottomZoneState extends State<_UnifiedBottomZone> {
       text: 'Attach the final review file',
     );
     _draftFocusNode = FocusNode();
+    _surfaceController = SpringSurfaceController(
+      vsync: this,
+      config: const SpringSurfaceConfig.bouncy(),
+    );
   }
 
   @override
   void dispose() {
     _draftController.dispose();
     _draftFocusNode.dispose();
+    _surfaceController.dispose();
     super.dispose();
   }
 
-  void _expandComposer() {
-    if (_isExpanded) {
-      return;
-    }
+  Future<void> _closeComposer() async {
     _draftFocusNode.unfocus();
-    setState(() => _isExpanded = true);
-  }
-
-  void _closeComposer() {
-    if (!_isExpanded) {
-      return;
-    }
-    setState(() => _isExpanded = false);
+    await _surfaceController.collapse();
   }
 
   @override
@@ -872,47 +868,60 @@ class _UnifiedBottomZoneState extends State<_UnifiedBottomZone> {
                 ),
               ),
             ),
-            if (_isExpanded)
-              _ZoneBackdrop(
-                backdropKey: const Key(
-                  'unified_showcase_bottom_composer_backdrop',
-                ),
-                color: bottomAccent.withAlpha(16),
-                onTap: _closeComposer,
-              ),
             Positioned(
               left: 16,
               right: 16,
               bottom: 16,
               height: 240,
-              child: SpringSurface(
-                isExpanded: _isExpanded,
-                anchor: SpringSurfaceAnchor.bottomCenter,
-                expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
-                maxExpandedHeight: 224,
-                config: const SpringSurfaceConfig.bouncy(),
-                collapsedSize: const Size(320, 56),
-                expandedSize: const Size(320, 194),
-                collapsedDecoration: _collapsedDecoration(bottomAccent),
-                expandedDecoration: _expandedDecoration(bottomAccent),
-                collapsedChild: ComposerBar(
-                  placeholder: 'Reply, attach, or start a task',
-                  accent: bottomAccent,
-                  controller: _draftController,
-                  focusNode: _draftFocusNode,
-                  onExpandTap: _expandComposer,
-                  inputFieldKey: const Key(
-                    'unified_showcase_bottom_composer_input_field',
-                  ),
-                  expandButtonKey: const Key(
-                    'unified_showcase_bottom_composer_expand_button',
-                  ),
-                ),
-                expandedChild: _BottomComposerPanel(
-                  onClose: _closeComposer,
-                  accent: bottomAccent,
-                  draftController: _draftController,
-                ),
+              child: ListenableBuilder(
+                listenable: _surfaceController,
+                builder: (context, _) {
+                  return Stack(
+                    children: [
+                      if (_surfaceController.isExpanded)
+                        _ZoneBackdrop(
+                          backdropKey: const Key(
+                            'unified_showcase_bottom_composer_backdrop',
+                          ),
+                          color: bottomAccent.withAlpha(16),
+                          onTap: () {
+                            _closeComposer();
+                          },
+                        ),
+                      Positioned.fill(
+                        child: SpringSurface.controlled(
+                          controller: _surfaceController,
+                          anchor: SpringSurfaceAnchor.bottomCenter,
+                          expandedSizing:
+                              SpringSurfaceExpandedSizing.dynamicHeight,
+                          maxExpandedHeight: 224,
+                          collapsedSize: const Size(320, 56),
+                          expandedSize: const Size(320, 194),
+                          collapsedDecoration: _collapsedDecoration(
+                            bottomAccent,
+                          ),
+                          expandedDecoration: _expandedDecoration(bottomAccent),
+                          collapsedChild: ComposerBar(
+                            placeholder: 'Reply, attach, or start a task',
+                            accent: bottomAccent,
+                            controller: _draftController,
+                            focusNode: _draftFocusNode,
+                            inputFieldKey: const Key(
+                              'unified_showcase_bottom_composer_input_field',
+                            ),
+                            expandButtonKey: const Key(
+                              'unified_showcase_bottom_composer_expand_button',
+                            ),
+                          ),
+                          expandedChild: _BottomComposerPanel(
+                            accent: bottomAccent,
+                            draftController: _draftController,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ],
@@ -1176,12 +1185,10 @@ class _AvailabilityDetailPanel extends StatelessWidget {
 
 class _BottomComposerPanel extends StatelessWidget {
   const _BottomComposerPanel({
-    required this.onClose,
     required this.accent,
     required this.draftController,
   });
 
-  final VoidCallback onClose;
   final Color accent;
   final TextEditingController draftController;
 
@@ -1191,7 +1198,7 @@ class _BottomComposerPanel extends StatelessWidget {
       children: [
         GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: onClose,
+          onTap: () => SpringSurfaceActions.of(context).collapse(),
           child: PanelHeaderButton(
             label: 'Compose next step',
             icon: Icons.chat_bubble_outline_rounded,

@@ -24,10 +24,11 @@ class MessageComposerScenario extends StatefulWidget {
       MessageComposerScenarioState();
 }
 
-class MessageComposerScenarioState
-    extends ExpandableSceneState<MessageComposerScenario> {
+class MessageComposerScenarioState extends State<MessageComposerScenario>
+    with SingleTickerProviderStateMixin {
   late final TextEditingController _draftController;
   late final FocusNode _draftFocusNode;
+  late final SpringSurfaceController _surfaceController;
 
   @override
   void initState() {
@@ -36,12 +37,17 @@ class MessageComposerScenarioState
       text: _initialDraftFor(_ComposerMode.file),
     );
     _draftFocusNode = FocusNode();
+    _surfaceController = SpringSurfaceController(
+      vsync: this,
+      config: const SpringSurfaceConfig.gentle(),
+    );
   }
 
   @override
   void dispose() {
     _draftController.dispose();
     _draftFocusNode.dispose();
+    _surfaceController.dispose();
     super.dispose();
   }
 
@@ -56,12 +62,14 @@ class MessageComposerScenarioState
     }
   }
 
-  void _expandComposer() {
-    if (isExpanded) {
-      return;
-    }
+  Future<void> _closeComposer() async {
     _draftFocusNode.unfocus();
-    toggle();
+    await _surfaceController.collapse();
+  }
+
+  Future<void> _toggleComposer() async {
+    _draftFocusNode.unfocus();
+    await _surfaceController.toggle();
   }
 
   @override
@@ -161,9 +169,13 @@ class MessageComposerScenarioState
     return BottomDockScenarioShell(
       keyPrefix: widget.keyPrefix,
       displayMode: widget.displayMode,
-      isExpanded: isExpanded,
-      onToggle: toggle,
-      onClose: close,
+      isExpanded: false,
+      onToggle: () {
+        _toggleComposer();
+      },
+      onClose: () {
+        _closeComposer();
+      },
       accent: accent,
       gradient: const LinearGradient(
         colors: [Color(0xFFF6FFF9), Color(0xFFEEF9F2)],
@@ -179,6 +191,7 @@ class MessageComposerScenarioState
       surfaceHostHeightCompact: 226,
       surfaceHostHeightFeatured: 242,
       wrapCollapsedChildWithToggle: false,
+      surfaceController: _surfaceController,
       backgroundBuilder: (context) {
         return Column(
           children: [
@@ -200,12 +213,10 @@ class MessageComposerScenarioState
         accent: accent,
         controller: _draftController,
         focusNode: _draftFocusNode,
-        onExpandTap: _expandComposer,
         inputFieldKey: Key('${widget.keyPrefix}_input_field'),
         expandButtonKey: Key('${widget.keyPrefix}_expand_button'),
       ),
       expandedChild: _MessageComposerPanel(
-        onToggle: toggle,
         label: panelLabel,
         rows: panelRows,
         draftController: _draftController,
@@ -217,14 +228,12 @@ class MessageComposerScenarioState
 
 class _MessageComposerPanel extends StatelessWidget {
   const _MessageComposerPanel({
-    required this.onToggle,
     required this.label,
     required this.rows,
     required this.draftController,
     required this.draftPreviewKey,
   });
 
-  final VoidCallback onToggle;
   final String label;
   final List<Widget> rows;
   final TextEditingController draftController;
@@ -236,7 +245,7 @@ class _MessageComposerPanel extends StatelessWidget {
       children: [
         GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: onToggle,
+          onTap: () => SpringSurfaceActions.of(context).collapse(),
           child: PanelHeaderButton(
             label: label,
             icon: Icons.attach_file_rounded,

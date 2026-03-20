@@ -1,6 +1,7 @@
 // ignore_for_file: use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
+import 'package:spring_surface/spring_surface.dart';
 
 class SurfaceScrollableContent extends StatelessWidget {
   const SurfaceScrollableContent({required this.children});
@@ -308,7 +309,7 @@ class ComposerBar extends StatelessWidget {
     required this.accent,
     required this.controller,
     required this.focusNode,
-    required this.onExpandTap,
+    this.onExpandTap,
     this.inputFieldKey,
     this.expandButtonKey,
   });
@@ -317,7 +318,7 @@ class ComposerBar extends StatelessWidget {
   final Color accent;
   final TextEditingController controller;
   final FocusNode focusNode;
-  final VoidCallback onExpandTap;
+  final VoidCallback? onExpandTap;
   final Key? inputFieldKey;
   final Key? expandButtonKey;
 
@@ -332,7 +333,15 @@ class ComposerBar extends StatelessWidget {
             GestureDetector(
               key: expandButtonKey,
               behavior: HitTestBehavior.opaque,
-              onTap: onExpandTap,
+              onTap: () {
+                focusNode.unfocus();
+                final onTap = onExpandTap;
+                if (onTap != null) {
+                  onTap();
+                  return;
+                }
+                SpringSurfaceActions.of(context).expand();
+              },
               child: Container(
                 width: 34,
                 height: 34,

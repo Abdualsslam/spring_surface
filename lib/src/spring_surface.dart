@@ -4,6 +4,7 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import 'spring_surface_actions.dart';
 import 'spring_surface_config.dart';
 import 'spring_surface_controller.dart';
 import 'spring_surface_motion.dart';
@@ -84,7 +85,12 @@ enum SpringSurfaceContentState {
 ///   collapsedSize: const Size(200, 52),
 ///   expandedSize: const Size(360, 480),
 ///   expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
-///   collapsedChild: const Text('Open'),
+///   collapsedChild: Builder(
+///     builder: (context) => IconButton(
+///       onPressed: () => SpringSurfaceActions.of(context).expand(),
+///       icon: const Icon(Icons.add_rounded),
+///     ),
+///   ),
 ///   expandedChild: MySheet(),
 /// )
 /// ```
@@ -203,6 +209,12 @@ class _SpringSurfaceState extends State<SpringSurface>
 
   Widget get _effectiveExpandedChild =>
       widget.expandedChild ?? const SizedBox.shrink();
+
+  Widget get _scopedCollapsedChild =>
+      _wrapWithActionsScope(widget.collapsedChild);
+
+  Widget get _scopedExpandedChild =>
+      _wrapWithActionsScope(_effectiveExpandedChild);
 
   @override
   void initState() {
@@ -449,7 +461,7 @@ class _SpringSurfaceState extends State<SpringSurface>
                 ignoring: collapsedOpacity < 0.01,
                 child: Opacity(
                   opacity: collapsedOpacity.clamp(0.0, 1.0),
-                  child: Center(child: widget.collapsedChild),
+                  child: Center(child: _scopedCollapsedChild),
                 ),
               ),
             ],
@@ -490,7 +502,7 @@ class _SpringSurfaceState extends State<SpringSurface>
           ),
           child: Opacity(
             opacity: _isUnavailable ? 0.6 : 1.0,
-            child: Center(child: widget.collapsedChild),
+            child: Center(child: _scopedCollapsedChild),
           ),
         ),
       ),
@@ -571,20 +583,17 @@ class _SpringSurfaceState extends State<SpringSurface>
 
   Widget _buildExpandedContent({required bool shouldScroll}) {
     if (shouldScroll) {
-      return SingleChildScrollView(
-        primary: false,
-        child: _effectiveExpandedChild,
-      );
+      return SingleChildScrollView(primary: false, child: _scopedExpandedChild);
     }
     if (_usesDynamicExpandedHeight) {
       return OverflowBox(
         alignment: Alignment.topCenter,
         minHeight: 0,
         maxHeight: double.infinity,
-        child: _effectiveExpandedChild,
+        child: _scopedExpandedChild,
       );
     }
-    return _effectiveExpandedChild;
+    return _scopedExpandedChild;
   }
 
   Widget _buildExpandedChildMeasurement() {
@@ -601,12 +610,20 @@ class _SpringSurfaceState extends State<SpringSurface>
             width: _effectiveExpandedSize.width,
             child: _SizeReporter(
               onSizeChanged: _handleExpandedChildMeasuredSize,
-              child: _effectiveExpandedChild,
+              child: _scopedExpandedChild,
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _wrapWithActionsScope(Widget child) {
+    final controller = widget.controller;
+    if (controller == null) {
+      return child;
+    }
+    return SpringSurfaceActions(controller: controller, child: child);
   }
 
   void _handleExpandedChildMeasuredSize(Size size) {
