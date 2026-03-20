@@ -356,15 +356,6 @@ class _SpringSurfaceState extends State<SpringSurface>
       config: cfg,
     );
 
-    final pulse = isCollapsing
-        ? 1.0
-        : SpringSurfaceMotion.overshootPulse(
-            t,
-            amplitude: SpringSurfaceMotion.overshootAmplitudeForClamp(
-              cfg.overshootClamp,
-            ),
-          );
-
     final baseW = lerpDouble(
       widget.collapsedSize.width,
       _effectiveExpandedSize.width,
@@ -375,9 +366,22 @@ class _SpringSurfaceState extends State<SpringSurface>
       targetExpandedHeight,
       hProgress,
     )!;
-
-    final currentW = baseW * (1.0 + (pulse - 1.0) * 0.45);
-    final currentH = baseH * pulse;
+    final currentW =
+        baseW *
+        SpringSurfaceMotion.axisReboundScale(
+          t,
+          axis: SpringSurfaceAxis.horizontal,
+          isCollapsing: isCollapsing,
+          config: cfg,
+        );
+    final currentH =
+        baseH *
+        SpringSurfaceMotion.axisReboundScale(
+          t,
+          axis: SpringSurfaceAxis.vertical,
+          isCollapsing: isCollapsing,
+          config: cfg,
+        );
 
     final rProgress = SpringSurfaceMotion.radiusProgress(
       t,

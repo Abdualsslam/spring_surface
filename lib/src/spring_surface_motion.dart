@@ -97,6 +97,57 @@ class SpringSurfaceMotion {
     return 1.0 + main - settle;
   }
 
+  static double axisReboundScale(
+    double progress, {
+    required SpringSurfaceAxis axis,
+    required bool isCollapsing,
+    required SpringSurfaceConfig config,
+  }) {
+    if (config.reboundProfile == SpringSurfaceReboundProfile.simultaneous) {
+      if (isCollapsing) {
+        return 1.0;
+      }
+
+      final pulse = overshootPulse(
+        progress,
+        amplitude: overshootAmplitudeForClamp(config.overshootClamp),
+      );
+
+      if (axis == SpringSurfaceAxis.horizontal) {
+        return 1.0 + (pulse - 1.0) * 0.45;
+      }
+
+      return pulse;
+    }
+
+    final motionProgress = isCollapsing ? 1.0 - progress : progress;
+    final primaryAxis = isCollapsing
+        ? SpringSurfaceAxis.horizontal
+        : SpringSurfaceAxis.vertical;
+    final firstPhase = segment(
+      motionProgress,
+      begin: 0.56,
+      end: 0.78,
+      curve: Curves.easeInOutCubic,
+    );
+    final secondPhase = segment(
+      motionProgress,
+      begin: 0.74,
+      end: 0.98,
+      curve: Curves.easeInOutCubic,
+    );
+    final activeAxisScale = _phaseReboundMultiplier(
+      axis == primaryAxis ? firstPhase : secondPhase,
+      amplitude: _activeReboundAmplitude(axis: axis, config: config),
+    );
+    final counterAxisScale = _counterCompressionMultiplier(
+      axis == primaryAxis ? secondPhase : firstPhase,
+      amplitude: _counterCompressionAmplitude(axis: axis, config: config),
+    );
+
+    return (activeAxisScale * counterAxisScale).clamp(0.88, 1.12);
+  }
+
   static double bottomEdgeProgress(
     double progress, {
     required bool isCollapsing,
@@ -243,5 +294,49 @@ class SpringSurfaceMotion {
     }
     final envelope = math.pow(1 - progress, 1.6).toDouble();
     return math.sin(progress * math.pi) * envelope * amplitude;
+  }
+
+  static double _activeReboundAmplitude({
+    required SpringSurfaceAxis axis,
+    required SpringSurfaceConfig config,
+  }) {
+    final overshoot = overshootAmplitudeForClamp(config.overshootClamp);
+    if (axis == SpringSurfaceAxis.horizontal) {
+      return math.min(overshoot * 0.34, 0.045);
+    }
+    return math.min(overshoot * 0.60, 0.072);
+  }
+
+  static double _counterCompressionAmplitude({
+    required SpringSurfaceAxis axis,
+    required SpringSurfaceConfig config,
+  }) {
+    final activeAmplitude = _activeReboundAmplitude(axis: axis, config: config);
+    if (axis == SpringSurfaceAxis.horizontal) {
+      return math.min(activeAmplitude * 0.30, 0.014);
+    }
+    return math.min(activeAmplitude * 0.26, 0.018);
+  }
+
+  static double _phaseReboundMultiplier(
+    double progress, {
+    required double amplitude,
+  }) {
+    if (progress <= 0 || progress >= 1 || amplitude <= 0) {
+      return 1.0;
+    }
+    final envelope = math.pow(1.0 - (progress * 0.35), 1.1).toDouble();
+    return 1.0 + (math.sin(progress * math.pi) * amplitude * envelope);
+  }
+
+  static double _counterCompressionMultiplier(
+    double progress, {
+    required double amplitude,
+  }) {
+    if (progress <= 0 || progress >= 1 || amplitude <= 0) {
+      return 1.0;
+    }
+    final envelope = math.pow(1.0 - (progress * 0.28), 1.2).toDouble();
+    return 1.0 - (math.sin(progress * math.pi) * amplitude * envelope);
   }
 }

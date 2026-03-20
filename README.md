@@ -9,6 +9,7 @@ It is designed for inline actions, drawers, search affordances, composer bars, a
 - Declarative API with `isExpanded`
 - Controller-based API with `SpringSurfaceController`
 - Configurable spring tuning via `SpringSurfaceConfig`
+- Optional rebound profiles, including a sequential cross-axis stretch
 - 9-point anchors for fixed-size expansion, from `topLeft` to `bottomRight`
 - Content states for `ready`, `pending`, and `unavailable`
 - Legacy `top`, `center`, and `bottom` origins still supported
@@ -92,6 +93,12 @@ SpringSurface.controlled(
   collapsedChild: const Text('Compose'),
   expandedChild: const Text('Composer panel'),
 )
+```
+
+You can also opt into a more natural late-stage rebound:
+
+```dart
+const config = SpringSurfaceConfig.natural();
 ```
 
 ## Partial Triggers

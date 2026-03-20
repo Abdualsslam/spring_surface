@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'src/spring_surface_playground.dart';
-import 'src/spring_surface_test_lab_page.dart';
 import 'src/spring_surface_unified_showcase_page.dart';
 
 void main() => runApp(const MyApp());
@@ -18,8 +17,6 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4F46E5)),
       ),
       routes: {
-        SpringSurfaceTestLabPage.routeName: (_) =>
-            const SpringSurfaceTestLabPage(),
         SpringSurfaceUnifiedShowcasePage.routeName: (_) =>
             const SpringSurfaceUnifiedShowcasePage(),
       },

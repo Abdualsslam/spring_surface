@@ -11,6 +11,11 @@ const SpringSurfaceConfig _fastConfig = SpringSurfaceConfig(
   expandDuration: Duration(milliseconds: 40),
   collapseDuration: Duration(milliseconds: 40),
 );
+const SpringSurfaceConfig _fastNaturalConfig = SpringSurfaceConfig(
+  expandDuration: Duration(milliseconds: 40),
+  collapseDuration: Duration(milliseconds: 40),
+  reboundProfile: SpringSurfaceReboundProfile.sequentialCrossAxis,
+);
 
 void main() {
   test('overshootClamp increases the visible overshoot amplitude mapping', () {
@@ -61,6 +66,81 @@ void main() {
     expect(late, greaterThanOrEqualTo(1.0));
     expect(late, lessThan(mid));
     expect(SpringSurfaceMotion.overshootPulse(1.0), 1.0);
+  });
+
+  test('natural preset enables sequential cross-axis rebound', () {
+    const config = SpringSurfaceConfig.natural();
+
+    expect(
+      config.reboundProfile,
+      SpringSurfaceReboundProfile.sequentialCrossAxis,
+    );
+  });
+
+  test('sequentialCrossAxis rebounds vertical before horizontal on expand', () {
+    const config = SpringSurfaceConfig.natural();
+    final earlyVertical = SpringSurfaceMotion.axisReboundScale(
+      0.67,
+      axis: SpringSurfaceAxis.vertical,
+      isCollapsing: false,
+      config: config,
+    );
+    final earlyHorizontal = SpringSurfaceMotion.axisReboundScale(
+      0.67,
+      axis: SpringSurfaceAxis.horizontal,
+      isCollapsing: false,
+      config: config,
+    );
+    final lateVertical = SpringSurfaceMotion.axisReboundScale(
+      0.86,
+      axis: SpringSurfaceAxis.vertical,
+      isCollapsing: false,
+      config: config,
+    );
+    final lateHorizontal = SpringSurfaceMotion.axisReboundScale(
+      0.86,
+      axis: SpringSurfaceAxis.horizontal,
+      isCollapsing: false,
+      config: config,
+    );
+
+    expect(earlyVertical, greaterThan(1.0));
+    expect(earlyHorizontal, lessThan(1.0));
+    expect(lateHorizontal, greaterThan(1.0));
+    expect(lateVertical, lessThan(earlyVertical));
+  });
+
+  test('sequentialCrossAxis reverses the rebound order on collapse', () {
+    const config = SpringSurfaceConfig.natural();
+    final earlyHorizontal = SpringSurfaceMotion.axisReboundScale(
+      0.33,
+      axis: SpringSurfaceAxis.horizontal,
+      isCollapsing: true,
+      config: config,
+    );
+    final earlyVertical = SpringSurfaceMotion.axisReboundScale(
+      0.33,
+      axis: SpringSurfaceAxis.vertical,
+      isCollapsing: true,
+      config: config,
+    );
+    final lateHorizontal = SpringSurfaceMotion.axisReboundScale(
+      0.14,
+      axis: SpringSurfaceAxis.horizontal,
+      isCollapsing: true,
+      config: config,
+    );
+    final lateVertical = SpringSurfaceMotion.axisReboundScale(
+      0.14,
+      axis: SpringSurfaceAxis.vertical,
+      isCollapsing: true,
+      config: config,
+    );
+
+    expect(earlyHorizontal, greaterThan(1.0));
+    expect(earlyVertical, lessThan(1.0));
+    expect(lateVertical, greaterThan(1.0));
+    expect(lateHorizontal, lessThan(earlyHorizontal));
   });
 
   testWidgets('fixed sizing keeps the explicit expandedSize', (
@@ -164,6 +244,39 @@ void main() {
 
       _expectPinnedCorner(anchor, _surfaceRect(tester), hostRect);
     }
+  });
+
+  testWidgets('natural rebound profile still respects fixed corner anchors', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildHarness(
+        _buildSurface(
+          isExpanded: false,
+          anchor: SpringSurfaceAnchor.topLeft,
+          config: _fastNaturalConfig,
+        ),
+      ),
+    );
+
+    final hostRect = _hostRect(tester);
+
+    await tester.pumpWidget(
+      _buildHarness(
+        _buildSurface(
+          isExpanded: true,
+          anchor: SpringSurfaceAnchor.topLeft,
+          config: _fastNaturalConfig,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    _expectPinnedCorner(
+      SpringSurfaceAnchor.topLeft,
+      _surfaceRect(tester),
+      hostRect,
+    );
   });
 
   testWidgets('legacy origin still controls dynamic vertical alignment', (

@@ -1,3 +1,12 @@
+/// Controls how the late-stage rebound is distributed across axes.
+enum SpringSurfaceReboundProfile {
+  /// Keep the existing simultaneous rebound behavior.
+  simultaneous,
+
+  /// Rebound one axis first, then transfer tension to the cross-axis.
+  sequentialCrossAxis,
+}
+
 /// All parameters that control the liquid spring animation.
 ///
 /// Use the named constructors for sensible presets, or fine-tune
@@ -33,6 +42,9 @@ class SpringSurfaceConfig {
   /// Duration of the collapse animation.
   final Duration collapseDuration;
 
+  /// Shapes how the late rebound is distributed across the two axes.
+  final SpringSurfaceReboundProfile reboundProfile;
+
   const SpringSurfaceConfig({
     this.stiffness = 220,
     this.damping = 18,
@@ -42,40 +54,56 @@ class SpringSurfaceConfig {
     this.verticalStretchAmplitude = 0.065,
     this.expandDuration = const Duration(milliseconds: 600),
     this.collapseDuration = const Duration(milliseconds: 600),
+    this.reboundProfile = SpringSurfaceReboundProfile.simultaneous,
   });
 
   /// Gentle — subtle overshoot, soft feel.
   const SpringSurfaceConfig.gentle()
-      : stiffness = 160,
-        damping = 22,
-        mass = 1.0,
-        overshootClamp = 1.02,
-        horizontalStretchAmplitude = 0.018,
-        verticalStretchAmplitude = 0.040,
-        expandDuration = const Duration(milliseconds: 700),
-        collapseDuration = const Duration(milliseconds: 600);
+    : stiffness = 160,
+      damping = 22,
+      mass = 1.0,
+      overshootClamp = 1.02,
+      horizontalStretchAmplitude = 0.018,
+      verticalStretchAmplitude = 0.040,
+      expandDuration = const Duration(milliseconds: 700),
+      collapseDuration = const Duration(milliseconds: 600),
+      reboundProfile = SpringSurfaceReboundProfile.simultaneous;
 
   /// Bouncy — exaggerated overshoot, playful feel.
   const SpringSurfaceConfig.bouncy()
-      : stiffness = 280,
-        damping = 12,
-        mass = 1.2,
-        overshootClamp = 1.08,
-        horizontalStretchAmplitude = 0.040,
-        verticalStretchAmplitude = 0.090,
-        expandDuration = const Duration(milliseconds: 550),
-        collapseDuration = const Duration(milliseconds: 500);
+    : stiffness = 280,
+      damping = 12,
+      mass = 1.2,
+      overshootClamp = 1.08,
+      horizontalStretchAmplitude = 0.040,
+      verticalStretchAmplitude = 0.090,
+      expandDuration = const Duration(milliseconds: 550),
+      collapseDuration = const Duration(milliseconds: 500),
+      reboundProfile = SpringSurfaceReboundProfile.simultaneous;
 
   /// Snappy — fast, minimal overshoot, utilitarian.
   const SpringSurfaceConfig.snappy()
-      : stiffness = 380,
-        damping = 28,
-        mass = 0.8,
-        overshootClamp = 1.01,
-        horizontalStretchAmplitude = 0.010,
-        verticalStretchAmplitude = 0.025,
-        expandDuration = const Duration(milliseconds: 400),
-        collapseDuration = const Duration(milliseconds: 380);
+    : stiffness = 380,
+      damping = 28,
+      mass = 0.8,
+      overshootClamp = 1.01,
+      horizontalStretchAmplitude = 0.010,
+      verticalStretchAmplitude = 0.025,
+      expandDuration = const Duration(milliseconds: 400),
+      collapseDuration = const Duration(milliseconds: 380),
+      reboundProfile = SpringSurfaceReboundProfile.simultaneous;
+
+  /// Natural - a softer cross-axis transfer that feels more elastic.
+  const SpringSurfaceConfig.natural()
+    : stiffness = 210,
+      damping = 20,
+      mass = 1.0,
+      overshootClamp = 1.04,
+      horizontalStretchAmplitude = 0.024,
+      verticalStretchAmplitude = 0.055,
+      expandDuration = const Duration(milliseconds: 640),
+      collapseDuration = const Duration(milliseconds: 540),
+      reboundProfile = SpringSurfaceReboundProfile.sequentialCrossAxis;
 
   SpringSurfaceConfig copyWith({
     double? stiffness,
@@ -86,6 +114,7 @@ class SpringSurfaceConfig {
     double? verticalStretchAmplitude,
     Duration? expandDuration,
     Duration? collapseDuration,
+    SpringSurfaceReboundProfile? reboundProfile,
   }) {
     return SpringSurfaceConfig(
       stiffness: stiffness ?? this.stiffness,
@@ -98,6 +127,7 @@ class SpringSurfaceConfig {
           verticalStretchAmplitude ?? this.verticalStretchAmplitude,
       expandDuration: expandDuration ?? this.expandDuration,
       collapseDuration: collapseDuration ?? this.collapseDuration,
+      reboundProfile: reboundProfile ?? this.reboundProfile,
     );
   }
 
@@ -112,17 +142,19 @@ class SpringSurfaceConfig {
           horizontalStretchAmplitude == other.horizontalStretchAmplitude &&
           verticalStretchAmplitude == other.verticalStretchAmplitude &&
           expandDuration == other.expandDuration &&
-          collapseDuration == other.collapseDuration;
+          collapseDuration == other.collapseDuration &&
+          reboundProfile == other.reboundProfile;
 
   @override
   int get hashCode => Object.hash(
-        stiffness,
-        damping,
-        mass,
-        overshootClamp,
-        horizontalStretchAmplitude,
-        verticalStretchAmplitude,
-        expandDuration,
-        collapseDuration,
-      );
+    stiffness,
+    damping,
+    mass,
+    overshootClamp,
+    horizontalStretchAmplitude,
+    verticalStretchAmplitude,
+    expandDuration,
+    collapseDuration,
+    reboundProfile,
+  );
 }

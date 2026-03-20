@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spring_surface/spring_surface.dart';
 
-import 'spring_surface_test_lab_page.dart';
 import 'spring_surface_unified_showcase_page.dart';
 
 enum _PlaygroundPlacement { top, center, bottom }
@@ -23,6 +22,28 @@ const List<List<SpringSurfaceAnchor>> _anchorGrid = [
     SpringSurfaceAnchor.bottomRight,
   ],
 ];
+
+const String _collapsedLabelText = 'بيانات الطلب';
+const String _expandedHeadingText = 'معلومات الحساب';
+const String _confirmPaymentText = 'تأكيد الدفع';
+const String _overshootDescriptionText =
+    'يحدد مقدار السماح بتجاوز الحجم المستهدف أثناء الحركة. '
+    'رفعه يزيد الارتداد والامتلاء البصري.';
+const String _expandedWidthDescriptionText =
+    'يحدد العرض النهائي للقطعة عندما تكون في الحالة المتمددة.';
+const String _expandedHeightDescriptionText =
+    'يحدد الارتفاع النهائي للقطعة عندما تكون في الحالة المتمددة.';
+const String _expandDescriptionText =
+    'مدة فتح القطعة بالمللي ثانية. القيم الأكبر تعطي فتحًا أبطأ وأكثر هدوءًا.';
+const String _collapseDescriptionText =
+    'مدة إغلاق القطعة بالمللي ثانية. القيم الأكبر تعطي إغلاقًا أبطأ وأكثر سلاسة.';
+const String _buttonWidthDescriptionText =
+    'يتحكم في عرض الزر الأساسي قبل التمدد داخل صفحة المثال.';
+const String _buttonHeightDescriptionText =
+    'يتحكم في ارتفاع الزر الأساسي قبل التمدد داخل صفحة المثال.';
+const String _placementDescriptionText =
+    'يحدد موضع القطعة داخل مساحة العرض في المثال: أعلى أو وسط أو أسفل.';
+const String _closeDialogText = 'إغلاق';
 
 String _anchorLabel(SpringSurfaceAnchor anchor) {
   switch (anchor) {
@@ -72,6 +93,8 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
   double _overshootClamp = 1.03;
   int _expandDurationMs = 600;
   int _collapseDurationMs = 600;
+  SpringSurfaceReboundProfile _reboundProfile =
+      SpringSurfaceReboundProfile.simultaneous;
   SpringSurfaceAnchor _anchor = SpringSurfaceAnchor.bottomCenter;
   _PlaygroundPlacement _placement = _PlaygroundPlacement.center;
 
@@ -149,6 +172,7 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
     verticalStretchAmplitude: _defaultVerticalStretch,
     expandDuration: Duration(milliseconds: _expandDurationMs),
     collapseDuration: Duration(milliseconds: _collapseDurationMs),
+    reboundProfile: _reboundProfile,
   );
 
   void _toggle() => setState(() => _isExpanded = !_isExpanded);
@@ -158,6 +182,7 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
       _overshootClamp = config.overshootClamp;
       _expandDurationMs = config.expandDuration.inMilliseconds;
       _collapseDurationMs = config.collapseDuration.inMilliseconds;
+      _reboundProfile = config.reboundProfile;
     });
   }
 
@@ -170,16 +195,6 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
         surfaceTintColor: Colors.transparent,
         title: const Text('Spring Surface Playground'),
         actions: [
-          IconButton(
-            key: const Key('playground_open_test_lab'),
-            tooltip: 'افتح صفحة الاختبارات',
-            onPressed: () {
-              Navigator.of(
-                context,
-              ).pushNamed(SpringSurfaceTestLabPage.routeName);
-            },
-            icon: const Icon(Icons.science_outlined),
-          ),
           IconButton(
             key: const Key('playground_open_unified_showcase'),
             tooltip: 'Unified showcase',
@@ -261,7 +276,7 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
                                 collapsedChild: const Center(
                                   child: Text(
                                     key: Key('playground_collapsed_label'),
-                                    'بيانات الطلب',
+                                    _collapsedLabelText,
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 17,
@@ -291,6 +306,7 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
               overshootClamp: _overshootClamp,
               expandDurationMs: _expandDurationMs,
               collapseDurationMs: _collapseDurationMs,
+              reboundProfile: _reboundProfile,
               anchor: _anchor,
               placement: _placement,
               onCollapsedWidth: (value) =>
@@ -307,6 +323,8 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
                   setState(() => _expandDurationMs = value),
               onCollapseDuration: (value) =>
                   setState(() => _collapseDurationMs = value),
+              onReboundProfile: (value) =>
+                  setState(() => _reboundProfile = value),
               onAnchor: (value) => setState(() => _anchor = value),
               onPlacement: (value) => setState(() => _placement = value),
               onPreset: _applyPreset,
@@ -350,7 +368,7 @@ class _ExpandedContent extends StatelessWidget {
             child: const Center(
               child: Text(
                 key: Key('playground_expanded_heading'),
-                'معلومات الحساب',
+                _expandedHeadingText,
                 style: TextStyle(
                   color: Color(0xFF4F46E5),
                   fontWeight: FontWeight.w600,
@@ -371,7 +389,7 @@ class _ExpandedContent extends StatelessWidget {
             ),
             child: const Center(
               child: Text(
-                'تأكيد الدفع',
+                _confirmPaymentText,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -403,6 +421,7 @@ class _ControlsPanel extends StatelessWidget {
     required this.overshootClamp,
     required this.expandDurationMs,
     required this.collapseDurationMs,
+    required this.reboundProfile,
     required this.anchor,
     required this.placement,
     required this.onCollapsedWidth,
@@ -412,6 +431,7 @@ class _ControlsPanel extends StatelessWidget {
     required this.onExpandedHeight,
     required this.onExpandDuration,
     required this.onCollapseDuration,
+    required this.onReboundProfile,
     required this.onAnchor,
     required this.onPlacement,
     required this.onPreset,
@@ -424,6 +444,7 @@ class _ControlsPanel extends StatelessWidget {
   final double overshootClamp;
   final int expandDurationMs;
   final int collapseDurationMs;
+  final SpringSurfaceReboundProfile reboundProfile;
   final SpringSurfaceAnchor anchor;
   final _PlaygroundPlacement placement;
   final ValueChanged<double> onCollapsedWidth;
@@ -433,6 +454,7 @@ class _ControlsPanel extends StatelessWidget {
   final ValueChanged<double> onExpandedHeight;
   final ValueChanged<int> onExpandDuration;
   final ValueChanged<int> onCollapseDuration;
+  final ValueChanged<SpringSurfaceReboundProfile> onReboundProfile;
   final ValueChanged<SpringSurfaceAnchor> onAnchor;
   final ValueChanged<_PlaygroundPlacement> onPlacement;
   final ValueChanged<SpringSurfaceConfig> onPreset;
@@ -458,8 +480,10 @@ class _ControlsPanel extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
               children: [
                 _PresetChip(
                   label: 'gentle',
@@ -472,6 +496,11 @@ class _ControlsPanel extends StatelessWidget {
                 _PresetChip(
                   label: 'bouncy',
                   onTap: () => onPreset(const SpringSurfaceConfig.bouncy()),
+                ),
+                _PresetChip(
+                  key: const Key('playground_preset_natural'),
+                  label: 'natural',
+                  onTap: () => onPreset(const SpringSurfaceConfig.natural()),
                 ),
                 _PresetChip(
                   label: 'snappy',
@@ -489,8 +518,7 @@ class _ControlsPanel extends StatelessWidget {
               digits: 2,
               onChanged: onOvershootClamp,
               infoKey: const Key('playground_info_overshoot'),
-              description:
-                  'يحدد مقدار السماح بتجاوز الحجم المستهدف أثناء الحركة. رفعه يزيد الارتداد والامتلاء البصري.',
+              description: _overshootDescriptionText,
             ),
             _SliderRow(
               label: 'expanded width',
@@ -502,8 +530,7 @@ class _ControlsPanel extends StatelessWidget {
               sliderKey: const Key('playground_expanded_width_slider'),
               valueKey: const Key('playground_expanded_width_value'),
               infoKey: const Key('playground_info_width'),
-              description:
-                  'يحدد العرض النهائي للقطعة عندما تكون في الحالة المتمددة.',
+              description: _expandedWidthDescriptionText,
             ),
             _SliderRow(
               label: 'expanded height',
@@ -515,8 +542,7 @@ class _ControlsPanel extends StatelessWidget {
               sliderKey: const Key('playground_expanded_height_slider'),
               valueKey: const Key('playground_expanded_height_value'),
               infoKey: const Key('playground_info_height'),
-              description:
-                  'يحدد الارتفاع النهائي للقطعة عندما تكون في الحالة المتمددة.',
+              description: _expandedHeightDescriptionText,
             ),
             _SliderRow(
               label: 'expand',
@@ -527,8 +553,7 @@ class _ControlsPanel extends StatelessWidget {
               unit: 'ms',
               onChanged: (value) => onExpandDuration(value.round()),
               infoKey: const Key('playground_info_expand'),
-              description:
-                  'مدة فتح القطعة بالمللي ثانية. القيم الأكبر تعطي فتحًا أبطأ وأكثر هدوءًا.',
+              description: _expandDescriptionText,
             ),
             _SliderRow(
               label: 'collapse',
@@ -539,8 +564,32 @@ class _ControlsPanel extends StatelessWidget {
               unit: 'ms',
               onChanged: (value) => onCollapseDuration(value.round()),
               infoKey: const Key('playground_info_collapse'),
+              description: _collapseDescriptionText,
+            ),
+            _SectionHeader(
+              title: 'rebound',
+              infoKey: const Key('playground_info_rebound'),
               description:
-                  'مدة إغلاق القطعة بالمللي ثانية. القيم الأكبر تعطي إغلاقًا أبطأ وأكثر سلاسة.',
+                  'Choose how the late rebound travels across the surface. Sequential cross-axis transfers tension vertically first on open, then horizontally, and reverses the order on collapse.',
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _ReboundProfileChip(
+                  key: const Key('playground_rebound_simultaneous'),
+                  label: 'simultaneous',
+                  value: SpringSurfaceReboundProfile.simultaneous,
+                  current: reboundProfile,
+                  onTap: onReboundProfile,
+                ),
+                _ReboundProfileChip(
+                  key: const Key('playground_rebound_sequential'),
+                  label: 'sequential',
+                  value: SpringSurfaceReboundProfile.sequentialCrossAxis,
+                  current: reboundProfile,
+                  onTap: onReboundProfile,
+                ),
+              ],
             ),
             _SectionHeader(
               title: 'anchor',
@@ -589,8 +638,7 @@ class _ControlsPanel extends StatelessWidget {
               digits: 0,
               onChanged: onCollapsedWidth,
               infoKey: const Key('playground_info_button_width'),
-              description:
-                  'يتحكم في عرض الزر الأساسي قبل التمدد داخل صفحة المثال.',
+              description: _buttonWidthDescriptionText,
             ),
             _SliderRow(
               label: 'button height',
@@ -600,14 +648,12 @@ class _ControlsPanel extends StatelessWidget {
               digits: 0,
               onChanged: onCollapsedHeight,
               infoKey: const Key('playground_info_button_height'),
-              description:
-                  'يتحكم في ارتفاع الزر الأساسي قبل التمدد داخل صفحة المثال.',
+              description: _buttonHeightDescriptionText,
             ),
             _SectionHeader(
               title: 'placement',
               infoKey: const Key('playground_info_placement'),
-              description:
-                  'يحدد موضع القطعة داخل مساحة العرض في المثال: أعلى أو وسط أو أسفل.',
+              description: _placementDescriptionText,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -715,7 +761,7 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _PresetChip extends StatelessWidget {
-  const _PresetChip({required this.label, required this.onTap});
+  const _PresetChip({super.key, required this.label, required this.onTap});
 
   final String label;
   final VoidCallback onTap;
@@ -736,6 +782,44 @@ class _PresetChip extends StatelessWidget {
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: Color(0xFF4F46E5),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ReboundProfileChip extends StatelessWidget {
+  const _ReboundProfileChip({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.current,
+    required this.onTap,
+  });
+
+  final String label;
+  final SpringSurfaceReboundProfile value;
+  final SpringSurfaceReboundProfile current;
+  final ValueChanged<SpringSurfaceReboundProfile> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = value == current;
+    return GestureDetector(
+      onTap: () => onTap(value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? const Color(0xFF4F46E5) : const Color(0xFFF0F0F8),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: selected ? Colors.white : const Color(0xFF4F46E5),
           ),
         ),
       ),
@@ -961,7 +1045,7 @@ class _InfoButton extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('إغلاق'),
+                child: const Text(_closeDialogText),
               ),
             ],
           ),
