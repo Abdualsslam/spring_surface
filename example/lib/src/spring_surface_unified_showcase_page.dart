@@ -415,7 +415,7 @@ class _UnifiedTopZoneState extends State<_UnifiedTopZone> {
   }
 }
 
-enum _MiddleSurfacePanel { queue, day, availability }
+enum _MiddleSurfacePanel { day, availability }
 
 class _UnifiedMiddleZoneState extends State<_UnifiedMiddleZone> {
   _MiddleSurfacePanel? _activePanel;
@@ -445,7 +445,6 @@ class _UnifiedMiddleZoneState extends State<_UnifiedMiddleZone> {
     const dayRowHeight = 40.0;
     const dayRowGap = 14.0;
     const gridSpacing = 10.0;
-    const queueExpandedSize = Size(214, 182);
     const dayExpandedSize = Size(216, 208);
     const availabilityExpandedSize = Size(214, 184);
 
@@ -523,12 +522,7 @@ class _UnifiedMiddleZoneState extends State<_UnifiedMiddleZone> {
               );
             }
 
-            final queueHostRect = anchoredHostRect(
-              collapsedTopLeft: cellTopLeft(0, 0),
-              collapsedSize: collapsedCellSize,
-              expandedSize: queueExpandedSize,
-              anchor: SpringSurfaceAnchor.centerLeft,
-            );
+            final queueCellTopLeft = cellTopLeft(0, 0);
             final dayHostRect = anchoredHostRect(
               collapsedTopLeft: cellTopLeft(1, 1),
               collapsedSize: collapsedCellSize,
@@ -541,6 +535,7 @@ class _UnifiedMiddleZoneState extends State<_UnifiedMiddleZone> {
               expandedSize: availabilityExpandedSize,
               anchor: SpringSurfaceAnchor.centerRight,
             );
+            final unavailableCellTopLeft = cellTopLeft(2, 2);
 
             return Stack(
               children: [
@@ -604,24 +599,17 @@ class _UnifiedMiddleZoneState extends State<_UnifiedMiddleZone> {
                             crossAxisSpacing: gridSpacing,
                             mainAxisSpacing: gridSpacing,
                             children: const [
-                              CalendarSlotGhost(
-                                time: '8:00',
-                                detail: 'Check-in',
-                              ),
+                              SizedBox.expand(),
                               CalendarSlotGhost(
                                 time: '8:30',
                                 detail: 'Available',
                               ),
-                              CalendarSlotGhost(time: '9:00', detail: 'Remote'),
+                              SizedBox.expand(),
                               CalendarSlotGhost(
                                 time: '9:30',
                                 detail: 'Lab prep',
                               ),
-                              CalendarSlotGhost(
-                                time: '10:00',
-                                detail: 'Follow-up',
-                                highlight: true,
-                              ),
+                              SizedBox.expand(),
                               CalendarSlotGhost(
                                 time: '10:30',
                                 detail: 'Available',
@@ -634,10 +622,7 @@ class _UnifiedMiddleZoneState extends State<_UnifiedMiddleZone> {
                                 time: '11:30',
                                 detail: 'Confirmed',
                               ),
-                              CalendarSlotGhost(
-                                time: '12:00',
-                                detail: 'Available',
-                              ),
+                              SizedBox.expand(),
                             ],
                           ),
                         ),
@@ -645,14 +630,6 @@ class _UnifiedMiddleZoneState extends State<_UnifiedMiddleZone> {
                     ),
                   ),
                 ),
-                if (_activePanel == _MiddleSurfacePanel.queue)
-                  _ZoneBackdrop(
-                    backdropKey: const Key(
-                      'unified_showcase_middle_queue_backdrop',
-                    ),
-                    color: leftAccent.withAlpha(16),
-                    onTap: _closePanel,
-                  ),
                 if (_activePanel == _MiddleSurfacePanel.day)
                   _ZoneBackdrop(
                     backdropKey: const Key(
@@ -670,36 +647,31 @@ class _UnifiedMiddleZoneState extends State<_UnifiedMiddleZone> {
                     onTap: _closePanel,
                   ),
                 Positioned(
-                  top: queueHostRect.top,
-                  left: queueHostRect.left,
-                  width: queueHostRect.width,
-                  height: queueHostRect.height,
+                  top: queueCellTopLeft.dy,
+                  left: queueCellTopLeft.dx,
+                  width: collapsedCellSize.width,
+                  height: collapsedCellSize.height,
                   child: SpringSurface(
-                    isExpanded: _activePanel == _MiddleSurfacePanel.queue,
+                    key: const Key('unified_showcase_middle_queue_surface'),
+                    isExpanded: false,
+                    contentState: SpringSurfaceContentState.pending,
                     anchor: SpringSurfaceAnchor.centerLeft,
                     config: const SpringSurfaceConfig.gentle(),
                     collapsedSize: collapsedCellSize,
-                    expandedSize: queueExpandedSize,
                     collapsedDecoration: _calendarCellDecoration(
                       accent: leftAccent,
                       tint: const Color(0xFFE8FBF5),
                     ),
-                    expandedDecoration: _expandedDecoration(leftAccent),
-                    collapsedChild: GestureDetector(
-                      key: const Key('unified_showcase_middle_queue_toggle'),
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => _togglePanel(_MiddleSurfacePanel.queue),
-                      child: const _MetricSurfaceButton(
+                    collapsedChild: const SizedBox(
+                      key: Key('unified_showcase_middle_queue_toggle'),
+                      width: 84,
+                      child: _MetricSurfaceButton(
                         title: 'Queue',
                         value: '12',
                         subtitle: 'waiting',
                         accent: leftAccent,
                         highlight: false,
                       ),
-                    ),
-                    expandedChild: _QueueDetailPanel(
-                      onClose: _closePanel,
-                      accent: leftAccent,
                     ),
                   ),
                 ),
@@ -710,6 +682,7 @@ class _UnifiedMiddleZoneState extends State<_UnifiedMiddleZone> {
                   height: dayHostRect.height,
                   child: SpringSurface(
                     isExpanded: _activePanel == _MiddleSurfacePanel.day,
+                    contentState: SpringSurfaceContentState.ready,
                     anchor: SpringSurfaceAnchor.center,
                     expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
                     maxExpandedHeight: 236,
@@ -746,6 +719,7 @@ class _UnifiedMiddleZoneState extends State<_UnifiedMiddleZone> {
                   child: SpringSurface(
                     isExpanded:
                         _activePanel == _MiddleSurfacePanel.availability,
+                    contentState: SpringSurfaceContentState.ready,
                     anchor: SpringSurfaceAnchor.centerRight,
                     config: const SpringSurfaceConfig(),
                     collapsedSize: collapsedCellSize,
@@ -773,6 +747,35 @@ class _UnifiedMiddleZoneState extends State<_UnifiedMiddleZone> {
                     expandedChild: _AvailabilityDetailPanel(
                       onClose: _closePanel,
                       accent: rightAccent,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: unavailableCellTopLeft.dy,
+                  left: unavailableCellTopLeft.dx,
+                  width: collapsedCellSize.width,
+                  height: collapsedCellSize.height,
+                  child: SpringSurface(
+                    key: const Key(
+                      'unified_showcase_middle_unavailable_surface',
+                    ),
+                    isExpanded: false,
+                    contentState: SpringSurfaceContentState.unavailable,
+                    collapsedSize: collapsedCellSize,
+                    collapsedDecoration: _calendarCellDecoration(
+                      accent: const Color(0xFF64748B),
+                      tint: const Color(0xFFF1F5F9),
+                    ),
+                    collapsedChild: const SizedBox(
+                      key: Key('unified_showcase_middle_unavailable_cell'),
+                      width: 84,
+                      child: _MetricSurfaceButton(
+                        title: '12:00',
+                        value: 'Closed',
+                        subtitle: 'No data',
+                        accent: Color(0xFF64748B),
+                        highlight: false,
+                      ),
                     ),
                   ),
                 ),
@@ -1064,36 +1067,6 @@ class _TopFilterPanel extends StatelessWidget {
             ),
           ),
         ),
-      ],
-    );
-  }
-}
-
-class _QueueDetailPanel extends StatelessWidget {
-  const _QueueDetailPanel({required this.onClose, required this.accent});
-
-  final VoidCallback onClose;
-  final Color accent;
-
-  @override
-  Widget build(BuildContext context) {
-    return SurfaceScrollableContent(
-      children: [
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: onClose,
-          child: PanelHeaderButton(
-            label: 'Waiting queue',
-            icon: Icons.people_alt_outlined,
-            accent: accent,
-          ),
-        ),
-        const SizedBox(height: 12),
-        const InfoRow(label: 'Walk-ins', value: '4 patients'),
-        const SizedBox(height: 8),
-        const InfoRow(label: 'Pending lab', value: '3 samples'),
-        const SizedBox(height: 8),
-        const InfoRow(label: 'Needs triage', value: '2 cases'),
       ],
     );
   }

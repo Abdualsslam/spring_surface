@@ -9,6 +9,14 @@
 //   expandedChild: MySheet(),
 // )
 //
+// Pending usage:
+// SpringSurface(
+//   isExpanded: false,
+//   contentState: SpringSurfaceContentState.pending,
+//   collapsedSize: const Size(200, 48),
+//   collapsedChild: const Text('Waiting for data'),
+// )
+//
 // Usage (Controller):
 // final controller = SpringSurfaceController(
 //   vsync: this,

@@ -289,6 +289,144 @@ void main() {
     expect(expandedCount, 1);
     expect(collapsedCount, 1);
   });
+
+  testWidgets('ready surfaces still require expanded content and size', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildHarness(
+        SpringSurface(
+          isExpanded: false,
+          contentState: SpringSurfaceContentState.ready,
+          collapsedSize: _collapsedSize,
+          collapsedChild: const Text('Open'),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isA<AssertionError>());
+  });
+
+  testWidgets('pending accepts missing expanded data and pulses on tap', (
+    WidgetTester tester,
+  ) async {
+    var pendingTapCount = 0;
+
+    await tester.pumpWidget(
+      _buildHarness(
+        SpringSurface(
+          isExpanded: false,
+          contentState: SpringSurfaceContentState.pending,
+          config: _fastConfig,
+          collapsedSize: _collapsedSize,
+          collapsedChild: const Text('Pending'),
+          onPendingTap: () => pendingTapCount += 1,
+        ),
+      ),
+    );
+
+    expect(_surfaceSize(tester).width, closeTo(_collapsedSize.width, 0.01));
+
+    await tester.tap(find.text('Pending'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 45));
+
+    expect(_surfaceSize(tester).width, greaterThan(_collapsedSize.width));
+
+    await tester.pumpAndSettle();
+
+    expect(pendingTapCount, 1);
+    expect(_surfaceSize(tester).width, closeTo(_collapsedSize.width, 0.01));
+    expect(find.byType(SingleChildScrollView), findsNothing);
+  });
+
+  testWidgets('unavailable stays collapsed and ignores taps', (
+    WidgetTester tester,
+  ) async {
+    var pendingTapCount = 0;
+
+    await tester.pumpWidget(
+      _buildHarness(
+        SpringSurface(
+          isExpanded: false,
+          contentState: SpringSurfaceContentState.unavailable,
+          config: _fastConfig,
+          collapsedSize: _collapsedSize,
+          collapsedChild: const Text('Unavailable'),
+          onPendingTap: () => pendingTapCount += 1,
+        ),
+      ),
+    );
+
+    await tester.tapAt(_surfaceRect(tester).center);
+    await tester.pumpAndSettle();
+
+    expect(pendingTapCount, 0);
+    expect(_surfaceSize(tester).width, closeTo(_collapsedSize.width, 0.01));
+  });
+
+  testWidgets('controller pulse returns to a collapsed resting state', (
+    WidgetTester tester,
+  ) async {
+    late SpringSurfaceController controller;
+
+    await tester.pumpWidget(
+      _ControlledPulseHarness(onControllerReady: (value) => controller = value),
+    );
+
+    final pulse = controller.pulse();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 45));
+
+    expect(_surfaceSize(tester).width, greaterThan(_collapsedSize.width));
+
+    await tester.pumpAndSettle();
+    await pulse;
+
+    expect(controller.isExpanded, isFalse);
+    expect(controller.isPulsing, isFalse);
+    expect(_surfaceSize(tester).width, closeTo(_collapsedSize.width, 0.01));
+  });
+}
+
+class _ControlledPulseHarness extends StatefulWidget {
+  const _ControlledPulseHarness({required this.onControllerReady});
+
+  final ValueChanged<SpringSurfaceController> onControllerReady;
+
+  @override
+  State<_ControlledPulseHarness> createState() =>
+      _ControlledPulseHarnessState();
+}
+
+class _ControlledPulseHarnessState extends State<_ControlledPulseHarness>
+    with SingleTickerProviderStateMixin {
+  late final SpringSurfaceController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = SpringSurfaceController(vsync: this, config: _fastConfig);
+    widget.onControllerReady(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildHarness(
+      SpringSurface.controlled(
+        controller: _controller,
+        contentState: SpringSurfaceContentState.pending,
+        collapsedSize: _collapsedSize,
+        collapsedChild: const Text('Pulse'),
+      ),
+    );
+  }
 }
 
 Widget _buildHarness(Widget child, {Size hostSize = const Size(300, 300)}) {

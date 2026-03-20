@@ -563,6 +563,39 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Unified showcase pending queue cell pulses only', (
+    WidgetTester tester,
+  ) async {
+    await _openUnifiedShowcase(tester);
+
+    final surface = find.byKey(
+      const Key('unified_showcase_middle_queue_surface'),
+    );
+    final clip = find.descendant(of: surface, matching: find.byType(ClipRRect));
+    await _bringUnifiedFinderIntoComfortableView(tester, surface);
+
+    final initialSize = tester.getSize(clip);
+
+    await tester.tapAt(tester.getCenter(clip));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 45));
+
+    expect(tester.getSize(clip).width, closeTo(initialSize.width, 0.01));
+    expect(
+      find.byKey(const Key('unified_showcase_middle_day_backdrop')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const Key('unified_showcase_middle_availability_backdrop')),
+      findsNothing,
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(tester.getSize(clip).width, closeTo(initialSize.width, 0.01));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'Unified showcase side availability surface opens without overflow',
     (WidgetTester tester) async {
@@ -589,6 +622,34 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('Unified showcase unavailable cell ignores taps', (
+    WidgetTester tester,
+  ) async {
+    await _openUnifiedShowcase(tester);
+
+    final surface = find.byKey(
+      const Key('unified_showcase_middle_unavailable_surface'),
+    );
+    final clip = find.descendant(of: surface, matching: find.byType(ClipRRect));
+    await _bringUnifiedFinderIntoComfortableView(tester, surface);
+
+    final initialSize = tester.getSize(clip);
+
+    await tester.tapAt(tester.getCenter(clip));
+    await tester.pumpAndSettle();
+
+    expect(tester.getSize(clip).width, closeTo(initialSize.width, 0.01));
+    expect(
+      find.byKey(const Key('unified_showcase_middle_day_backdrop')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const Key('unified_showcase_middle_availability_backdrop')),
+      findsNothing,
+    );
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('Unified showcase bottom composer opens and closes', (
     WidgetTester tester,

@@ -10,6 +10,7 @@ It is designed for inline actions, drawers, search affordances, composer bars, a
 - Controller-based API with `SpringSurfaceController`
 - Configurable spring tuning via `SpringSurfaceConfig`
 - 9-point anchors for fixed-size expansion, from `topLeft` to `bottomRight`
+- Content states for `ready`, `pending`, and `unavailable`
 - Legacy `top`, `center`, and `bottom` origins still supported
 - Fixed and measured dynamic expanded sizing
 - Runnable example app under [`example/`](example)
@@ -111,6 +112,24 @@ SpringSurface(
 For `SpringSurfaceExpandedSizing.dynamicHeight`, the horizontal part of the
 anchor is ignored so `topLeft` and `topRight` both behave like `topCenter`,
 and the same applies to the `center` and `bottom` rows.
+
+## Content States
+
+Use `contentState` when a collapsed surface does not always have expanded data.
+
+```dart
+SpringSurface(
+  isExpanded: false,
+  contentState: SpringSurfaceContentState.pending,
+  collapsedSize: const Size(180, 48),
+  collapsedChild: const Text('Waiting for slot data'),
+  onPendingTap: _reloadSlots,
+)
+```
+
+- `ready`: normal expand/collapse behavior. `expandedSize` and `expandedChild` are required.
+- `pending`: no expanded content yet. The surface stays collapsed and plays a subtle pulse on tap.
+- `unavailable`: visible but disabled. No pulse and no expansion.
 
 ## Example app
 
