@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+* Updated `example/lib/main.dart` with comprehensive documentation and showcase details.
+
 ## 0.1.1
 
 * Initial public release.
