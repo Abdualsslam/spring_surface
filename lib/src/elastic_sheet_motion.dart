@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/animation.dart';
 
-import 'spring_surface_config.dart';
+import 'elastic_sheet_config.dart';
 
 enum SpringSurfaceAxis { horizontal, vertical }
 

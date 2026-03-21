@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'spring_surface_controller.dart';
+import 'elastic_sheet_controller.dart';
 
 /// Exposes [SpringSurfaceController] actions to descendants.
 ///

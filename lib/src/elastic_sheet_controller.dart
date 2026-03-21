@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
 
-import 'spring_surface_config.dart';
+import 'elastic_sheet_config.dart';
 
 /// Controller-based API for [SpringSurface].
 ///

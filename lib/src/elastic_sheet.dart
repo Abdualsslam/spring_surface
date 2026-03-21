@@ -4,10 +4,10 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import 'spring_surface_actions.dart';
-import 'spring_surface_config.dart';
-import 'spring_surface_controller.dart';
-import 'spring_surface_motion.dart';
+import 'elastic_sheet_actions.dart';
+import 'elastic_sheet_config.dart';
+import 'elastic_sheet_controller.dart';
+import 'elastic_sheet_motion.dart';
 
 /// Legacy vertical-only anchor for expansion.
 ///

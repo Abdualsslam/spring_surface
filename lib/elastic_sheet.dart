@@ -24,8 +24,8 @@
 // );
 // controller.expand();
 // controller.collapse();
-export 'src/spring_surface_actions.dart';
-export 'src/spring_surface_config.dart';
-export 'src/spring_surface_controller.dart';
-export 'src/spring_surface_motion.dart';
-export 'src/spring_surface.dart';
+export 'src/elastic_sheet_actions.dart';
+export 'src/elastic_sheet_config.dart';
+export 'src/elastic_sheet_controller.dart';
+export 'src/elastic_sheet_motion.dart';
+export 'src/elastic_sheet.dart';
