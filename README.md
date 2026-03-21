@@ -5,7 +5,7 @@
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 <p align="center">
-  <img src="doc/Care%20Desk%20showcase.gif" alt="Care Desk showcase" height="450" />
+  <img src="https://raw.githubusercontent.com/Abdualsslam/elastic_sheet/main/doc/Care%20Desk%20showcase.gif" alt="Care Desk showcase" height="450" />
 </p>
 
 `elastic_sheet` is a Flutter widget for building realistic expand/collapse surfaces with a liquid spring feel.
@@ -16,9 +16,9 @@ It is designed for inline actions, drawers, search affordances, composer bars, a
 
 | Feature | Description | Preview |
 | :--- | :--- | :---: |
-| **Spring Presets** | Completely configurable spring physics, ranging from snappy drawer snaps to gentle floating surfaces. | <img src="doc/presets.gif" width="220" alt="Presets" /> |
-| **Anchor (Compact)** | 9-point anchor system allows components to expand naturally from corners and edges without disrupting layout. | <img src="doc/anchor%20compact.gif" width="220" alt="Anchor Compact" /> |
-| **Anchor (Grid)** | Maintains layout integrity for multi-directional expansions, ideal for grids, cards, and complex responsive blocks. | <img src="doc/anchor%20grid.gif" width="220" alt="Anchor Grid" /> |
+| **Spring Presets** | Completely configurable spring physics, ranging from snappy drawer snaps to gentle floating surfaces. | <img src="https://raw.githubusercontent.com/Abdualsslam/elastic_sheet/main/doc/presets.gif" width="220" alt="Presets" /> |
+| **Anchor (Compact)** | 9-point anchor system allows components to expand naturally from corners and edges without disrupting layout. | <img src="https://raw.githubusercontent.com/Abdualsslam/elastic_sheet/main/doc/anchor%20compact.gif" width="220" alt="Anchor Compact" /> |
+| **Anchor (Grid)** | Maintains layout integrity for multi-directional expansions, ideal for grids, cards, and complex responsive blocks. | <img src="https://raw.githubusercontent.com/Abdualsslam/elastic_sheet/main/doc/anchor%20grid.gif" width="220" alt="Anchor Grid" /> |
 
 ## Features
 
