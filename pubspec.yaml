@@ -1,5 +1,11 @@
 name: elastic_sheet
 description: Elastic expand/collapse surface for Flutter with realistic showcase examples.
+topics:
+  - animation
+  - spring
+  - expandable
+  - bottom-sheet
+  - surface
 version: 0.1.0
 homepage: https://github.com/Abdualsslam/elastic_sheet
 repository: https://github.com/Abdualsslam/elastic_sheet
