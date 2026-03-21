@@ -1,4 +1,12 @@
-﻿# elastic_sheet
+# elastic_sheet
+
+![Care Desk showcase](https://raw.githubusercontent.com/Abdualsslam/elastic_sheet/main/docs/Care%20Desk%20showcase.gif)
+
+![presets](https://raw.githubusercontent.com/Abdualsslam/elastic_sheet/main/docs/presets.gif)
+
+![anchor compact](https://raw.githubusercontent.com/Abdualsslam/elastic_sheet/main/docs/anchor%20compact.gif)
+
+![anchor grid](https://raw.githubusercontent.com/Abdualsslam/elastic_sheet/main/docs/anchor%20grid.gif)
 
 `elastic_sheet` is a Flutter widget for building realistic expand/collapse surfaces with a liquid spring feel.
 
