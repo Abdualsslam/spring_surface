@@ -1,5 +1,12 @@
-import 'package:flutter/material.dart';
+// Full example app and showcase:
+// https://github.com/Abdualsslam/elastic_sheet/tree/main/example
+//
+// Includes:
+// - Interactive playground with live spring controls
+// - Care Desk unified showcase
+// - Multiple real-world scenarios
 
+import 'package:flutter/material.dart';
 import 'src/elastic_sheet_playground.dart';
 import 'src/elastic_sheet_unified_showcase_page.dart';
 
