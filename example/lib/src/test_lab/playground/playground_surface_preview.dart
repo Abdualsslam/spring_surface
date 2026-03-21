@@ -31,6 +31,8 @@ class PlaygroundSurfacePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -54,32 +56,43 @@ class PlaygroundSurfacePreview extends StatelessWidget {
                 collapsedSize: collapsedSize,
                 expandedSize: expandedSize,
                 collapsedBorderRadius: const BorderRadius.all(
-                  Radius.circular(32),
+                  Radius.circular(36),
                 ),
                 expandedBorderRadius: const BorderRadius.all(
-                  Radius.circular(22),
+                  Radius.circular(28),
                 ),
                 collapsedDecoration: BoxDecoration(
-                  color: const Color(0xFF4F46E5),
-                  borderRadius: BorderRadius.circular(32),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF6366F1), Color(0xFF4338CA)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(36),
                   boxShadow: const [
                     BoxShadow(
-                      color: Color(0x224F46E5),
-                      blurRadius: 22,
-                      offset: Offset(0, 12),
+                      color: Color(0x404338CA),
+                      blurRadius: 24,
+                      offset: Offset(0, 10),
                     ),
                   ],
                 ),
                 expandedDecoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(22),
-                  boxShadow: const [
+                  color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x16000000),
-                      blurRadius: 26,
-                      offset: Offset(0, 14),
+                      color: isDark ? const Color(0x33000000) : const Color(0x1A000000),
+                      blurRadius: 36,
+                      spreadRadius: -8,
+                      offset: const Offset(0, 16),
                     ),
                   ],
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.white.withOpacity(0.05)
+                        : Colors.black.withOpacity(0.04),
+                    width: 1,
+                  ),
                 ),
                 collapsedChild: const Center(
                   child: Text(
@@ -89,6 +102,7 @@ class PlaygroundSurfacePreview extends StatelessWidget {
                       color: Colors.white,
                       fontSize: 17,
                       fontWeight: FontWeight.w600,
+                      letterSpacing: -0.3,
                     ),
                   ),
                 ),
@@ -110,51 +124,79 @@ class PlaygroundExpandedContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: 8),
           Center(
             child: Container(
-              width: 40,
-              height: 4,
+              width: 48,
+              height: 5,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE5E7EB),
+                borderRadius: BorderRadius.circular(3),
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           Container(
-            height: 90,
+            height: 96,
             decoration: BoxDecoration(
-              color: const Color(0xFFF0F0F8),
-              borderRadius: BorderRadius.circular(14),
+              gradient: isDark
+                  ? const LinearGradient(
+                      colors: [Color(0xFF1E1B4B), Color(0xFF312E81)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : const LinearGradient(
+                      colors: [Color(0xFFEEF2FF), Color(0xFFE0E7FF)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isDark ? const Color(0xFF3730A3) : const Color(0xFFC7D2FE),
+                width: 1,
+              ),
             ),
-            child: const Center(
+            child: Center(
               child: Text(
-                key: Key('playground_expanded_heading'),
+                key: const Key('playground_expanded_heading'),
                 playgroundExpandedHeadingText,
                 style: TextStyle(
-                  color: Color(0xFF4F46E5),
-                  fontWeight: FontWeight.w600,
+                  color: isDark ? const Color(0xFFA5B4FC) : const Color(0xFF4338CA),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          _placeholder(52),
-          const SizedBox(height: 8),
-          _placeholder(52),
           const SizedBox(height: 16),
+          _placeholder(64, isDark),
+          const SizedBox(height: 12),
+          _placeholder(64, isDark),
+          const SizedBox(height: 24),
           Container(
-            height: 52,
+            height: 56,
             decoration: BoxDecoration(
-              color: const Color(0xFF4F46E5),
-              borderRadius: BorderRadius.circular(14),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF6366F1), Color(0xFF4338CA)],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x404338CA),
+                  blurRadius: 16,
+                  offset: Offset(0, 6),
+                ),
+              ],
             ),
             child: const Center(
               child: Text(
@@ -162,21 +204,27 @@ class PlaygroundExpandedContent extends StatelessWidget {
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.2,
                 ),
               ),
             ),
           ),
+          const SizedBox(height: 12),
         ],
       ),
     );
   }
 
-  Widget _placeholder(double height) => Container(
-    height: height,
-    decoration: BoxDecoration(
-      color: Colors.grey.shade100,
-      borderRadius: BorderRadius.circular(12),
-    ),
-  );
+  Widget _placeholder(double height, bool isDark) => Container(
+        height: height,
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF3F4F6),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF9FAFB),
+            width: 2,
+          ),
+        ),
+      );
 }
