@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:elastic_sheet/elastic_sheet.dart';
 
@@ -95,7 +94,9 @@ class PlaygroundControlsPanel extends StatelessWidget {
                 height: 5,
                 margin: const EdgeInsets.only(bottom: 24),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE5E7EB),
+                  color: isDark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFE5E7EB),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -695,7 +696,9 @@ class PlaygroundSliderRow extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF6B7280),
+                      color: isDark
+                          ? const Color(0xFFE2E8F0)
+                          : const Color(0xFF6B7280),
                     ),
                   ),
                 ),
@@ -713,13 +716,14 @@ class PlaygroundSliderRow extends StatelessWidget {
               data: SliderTheme.of(context).copyWith(
                 trackHeight: 4,
                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-                overlayShape:
-                    const RoundSliderOverlayShape(overlayRadius: 20),
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 20),
                 activeTrackColor: const Color(0xFF4F46E5),
-                thumbColor:
-                    isDark ? const Color(0xFF818CF8) : const Color(0xFF4F46E5),
-                inactiveTrackColor:
-                    isDark ? const Color(0xFF334155) : const Color(0xFFF3F4F6),
+                thumbColor: isDark
+                    ? const Color(0xFF818CF8)
+                    : const Color(0xFF4F46E5),
+                inactiveTrackColor: isDark
+                    ? const Color(0xFF334155)
+                    : const Color(0xFFF3F4F6),
                 overlayColor: const Color(0x1A4F46E5),
               ),
               child: Slider(
@@ -739,7 +743,9 @@ class PlaygroundSliderRow extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: isDark ? const Color(0xFF818CF8) : const Color(0xFF4F46E5),
+                color: isDark
+                    ? const Color(0xFF818CF8)
+                    : const Color(0xFF4F46E5),
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
               textAlign: TextAlign.end,
@@ -807,14 +813,18 @@ class PlaygroundInfoButton extends StatelessWidget {
               title,
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF111827),
+                color: isDark
+                    ? const Color(0xFFE2E8F0)
+                    : const Color(0xFF111827),
               ),
             ),
             content: Text(
               description,
               style: TextStyle(
                 height: 1.5,
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF4B5563),
+                color: isDark
+                    ? const Color(0xFF94A3B8)
+                    : const Color(0xFF4B5563),
               ),
             ),
             actions: [
@@ -823,7 +833,9 @@ class PlaygroundInfoButton extends StatelessWidget {
                 child: Text(
                   playgroundCloseDialogText,
                   style: TextStyle(
-                    color: isDark ? const Color(0xFF818CF8) : const Color(0xFF4F46E5),
+                    color: isDark
+                        ? const Color(0xFF818CF8)
+                        : const Color(0xFF4F46E5),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
