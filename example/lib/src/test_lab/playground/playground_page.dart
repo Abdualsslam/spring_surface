@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:elastic_sheet/elastic_sheet.dart';
 
-import '../../spring_surface_unified_showcase_page.dart';
+import '../../elastic_sheet_unified_showcase_page.dart';
 import 'playground_controls_panel.dart';
 import 'playground_models.dart';
 import 'playground_surface_preview.dart';
 
-class SpringSurfacePlayground extends StatefulWidget {
-  const SpringSurfacePlayground({super.key});
+class ElasticSheetPlayground extends StatefulWidget {
+  const ElasticSheetPlayground({super.key});
 
   @override
-  State<SpringSurfacePlayground> createState() =>
-      _SpringSurfacePlaygroundState();
+  State<ElasticSheetPlayground> createState() => _ElasticSheetPlaygroundState();
 }
 
-class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
+class _ElasticSheetPlaygroundState extends State<ElasticSheetPlayground> {
   static const double _defaultCollapsedWidth = 240;
   static const double _defaultCollapsedHeight = 54;
   static const double _defaultExpandedWidth = 320;
@@ -31,9 +30,9 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
   double _overshootClamp = 1.03;
   int _expandDurationMs = 600;
   int _collapseDurationMs = 600;
-  SpringSurfaceReboundProfile _reboundProfile =
-      SpringSurfaceReboundProfile.simultaneous;
-  SpringSurfaceAnchor _anchor = SpringSurfaceAnchor.bottomCenter;
+  ElasticSheetReboundProfile _reboundProfile =
+      ElasticSheetReboundProfile.simultaneous;
+  ElasticSheetAnchor _anchor = ElasticSheetAnchor.bottomCenter;
   PlaygroundPlacement _placement = PlaygroundPlacement.center;
 
   Size get _collapsedSize => Size(_collapsedWidth, _collapsedHeight);
@@ -49,34 +48,34 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
 
   double _collapsedLeftOffsetInHost() {
     switch (_anchor) {
-      case SpringSurfaceAnchor.topLeft:
-      case SpringSurfaceAnchor.centerLeft:
-      case SpringSurfaceAnchor.bottomLeft:
+      case ElasticSheetAnchor.topLeft:
+      case ElasticSheetAnchor.centerLeft:
+      case ElasticSheetAnchor.bottomLeft:
         return 0;
-      case SpringSurfaceAnchor.topCenter:
-      case SpringSurfaceAnchor.center:
-      case SpringSurfaceAnchor.bottomCenter:
+      case ElasticSheetAnchor.topCenter:
+      case ElasticSheetAnchor.center:
+      case ElasticSheetAnchor.bottomCenter:
         return (_surfaceHostWidth - _collapsedWidth) / 2;
-      case SpringSurfaceAnchor.topRight:
-      case SpringSurfaceAnchor.centerRight:
-      case SpringSurfaceAnchor.bottomRight:
+      case ElasticSheetAnchor.topRight:
+      case ElasticSheetAnchor.centerRight:
+      case ElasticSheetAnchor.bottomRight:
         return _surfaceHostWidth - _collapsedWidth;
     }
   }
 
   double _collapsedTopOffsetInHost() {
     switch (_anchor) {
-      case SpringSurfaceAnchor.topLeft:
-      case SpringSurfaceAnchor.topCenter:
-      case SpringSurfaceAnchor.topRight:
+      case ElasticSheetAnchor.topLeft:
+      case ElasticSheetAnchor.topCenter:
+      case ElasticSheetAnchor.topRight:
         return 0;
-      case SpringSurfaceAnchor.centerLeft:
-      case SpringSurfaceAnchor.center:
-      case SpringSurfaceAnchor.centerRight:
+      case ElasticSheetAnchor.centerLeft:
+      case ElasticSheetAnchor.center:
+      case ElasticSheetAnchor.centerRight:
         return (_surfaceHostHeight - _collapsedHeight) / 2;
-      case SpringSurfaceAnchor.bottomLeft:
-      case SpringSurfaceAnchor.bottomCenter:
-      case SpringSurfaceAnchor.bottomRight:
+      case ElasticSheetAnchor.bottomLeft:
+      case ElasticSheetAnchor.bottomCenter:
+      case ElasticSheetAnchor.bottomRight:
         return _surfaceHostHeight - _collapsedHeight;
     }
   }
@@ -104,7 +103,7 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
     return _desiredCollapsedLeft(availableWidth) - _collapsedLeftOffsetInHost();
   }
 
-  SpringSurfaceConfig get _config => SpringSurfaceConfig(
+  ElasticSheetConfig get _config => ElasticSheetConfig(
     overshootClamp: _overshootClamp,
     horizontalStretchAmplitude: _defaultHorizontalStretch,
     verticalStretchAmplitude: _defaultVerticalStretch,
@@ -115,7 +114,7 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
 
   void _toggle() => setState(() => _isExpanded = !_isExpanded);
 
-  void _applyPreset(SpringSurfaceConfig config) {
+  void _applyPreset(ElasticSheetConfig config) {
     setState(() {
       _overshootClamp = config.overshootClamp;
       _expandDurationMs = config.expandDuration.inMilliseconds;
@@ -139,7 +138,7 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
             onPressed: () {
               Navigator.of(
                 context,
-              ).pushNamed(SpringSurfaceUnifiedShowcasePage.routeName);
+              ).pushNamed(ElasticSheetUnifiedShowcasePage.routeName);
             },
             icon: const Icon(Icons.dashboard_customize_outlined),
           ),

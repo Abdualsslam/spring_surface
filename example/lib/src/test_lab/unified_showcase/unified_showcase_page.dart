@@ -9,18 +9,18 @@ import 'unified_showcase_models.dart';
 import 'unified_showcase_schedule_section.dart';
 import 'unified_showcase_shared_widgets.dart';
 
-class SpringSurfaceUnifiedShowcasePage extends StatefulWidget {
-  const SpringSurfaceUnifiedShowcasePage({super.key});
+class ElasticSheetUnifiedShowcasePage extends StatefulWidget {
+  const ElasticSheetUnifiedShowcasePage({super.key});
 
   static const routeName = '/unified-showcase';
 
   @override
-  State<SpringSurfaceUnifiedShowcasePage> createState() =>
-      _SpringSurfaceUnifiedShowcasePageState();
+  State<ElasticSheetUnifiedShowcasePage> createState() =>
+      _ElasticSheetUnifiedShowcasePageState();
 }
 
-class _SpringSurfaceUnifiedShowcasePageState
-    extends State<SpringSurfaceUnifiedShowcasePage>
+class _ElasticSheetUnifiedShowcasePageState
+    extends State<ElasticSheetUnifiedShowcasePage>
     with TickerProviderStateMixin {
   bool _searchExpanded = false;
   bool _filterExpanded = false;
@@ -29,7 +29,7 @@ class _SpringSurfaceUnifiedShowcasePageState
   UnifiedShowcaseFilterPreset _filterPreset =
       UnifiedShowcaseFilterPreset.urgent;
   UnifiedShowcaseLocale _locale = UnifiedShowcaseLocale.english;
-  late final SpringSurfaceController _composerController;
+  late final ElasticSheetController _composerController;
   late final TextEditingController _draftController;
   late final FocusNode _draftFocusNode;
 
@@ -44,9 +44,9 @@ class _SpringSurfaceUnifiedShowcasePageState
       text: englishUnifiedShowcaseStrings.defaultDraftText,
     );
     _draftFocusNode = FocusNode();
-    _composerController = SpringSurfaceController(
+    _composerController = ElasticSheetController(
       vsync: this,
-      config: const SpringSurfaceConfig.bouncy(),
+      config: const ElasticSheetConfig.bouncy(),
     );
   }
 

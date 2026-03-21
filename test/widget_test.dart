@@ -7,51 +7,51 @@ const Size _collapsedSize = Size(100, 40);
 const Size _expandedSize = Size(220, 260);
 const Size _actionCollapsedSize = Size(220, 56);
 const Size _actionExpandedSize = Size(220, 180);
-const SpringSurfaceConfig _fastConfig = SpringSurfaceConfig(
+const ElasticSheetConfig _fastConfig = ElasticSheetConfig(
   expandDuration: Duration(milliseconds: 40),
   collapseDuration: Duration(milliseconds: 40),
 );
-const SpringSurfaceConfig _fastNaturalConfig = SpringSurfaceConfig(
+const ElasticSheetConfig _fastNaturalConfig = ElasticSheetConfig(
   expandDuration: Duration(milliseconds: 40),
   collapseDuration: Duration(milliseconds: 40),
-  reboundProfile: SpringSurfaceReboundProfile.sequentialCrossAxis,
+  reboundProfile: ElasticSheetReboundProfile.sequentialCrossAxis,
 );
 
 void main() {
   test('overshootClamp increases the visible overshoot amplitude mapping', () {
-    expect(SpringSurfaceMotion.overshootAmplitudeForClamp(1.0), 0.0);
+    expect(ElasticSheetMotion.overshootAmplitudeForClamp(1.0), 0.0);
     expect(
-      SpringSurfaceMotion.overshootAmplitudeForClamp(1.12),
-      greaterThan(SpringSurfaceMotion.overshootAmplitudeForClamp(1.03)),
+      ElasticSheetMotion.overshootAmplitudeForClamp(1.12),
+      greaterThan(ElasticSheetMotion.overshootAmplitudeForClamp(1.03)),
     );
   });
 
   test('axisProgress adds a subtle anticipation before expansion', () {
-    const config = SpringSurfaceConfig();
+    const config = ElasticSheetConfig();
 
     expect(
-      SpringSurfaceMotion.axisProgress(
+      ElasticSheetMotion.axisProgress(
         0.05,
         isCollapsing: false,
-        axis: SpringSurfaceAxis.horizontal,
+        axis: ElasticSheetAxis.horizontal,
         config: config,
       ),
       lessThan(0.0),
     );
     expect(
-      SpringSurfaceMotion.axisProgress(
+      ElasticSheetMotion.axisProgress(
         0.05,
         isCollapsing: false,
-        axis: SpringSurfaceAxis.vertical,
+        axis: ElasticSheetAxis.vertical,
         config: config,
       ),
       lessThan(0.0),
     );
     expect(
-      SpringSurfaceMotion.axisProgress(
+      ElasticSheetMotion.axisProgress(
         0.24,
         isCollapsing: false,
-        axis: SpringSurfaceAxis.vertical,
+        axis: ElasticSheetAxis.vertical,
         config: config,
       ),
       greaterThan(0.0),
@@ -59,47 +59,47 @@ void main() {
   });
 
   test('overshootPulse settles back toward rest near the end', () {
-    final mid = SpringSurfaceMotion.overshootPulse(0.78);
-    final late = SpringSurfaceMotion.overshootPulse(0.95);
+    final mid = ElasticSheetMotion.overshootPulse(0.78);
+    final late = ElasticSheetMotion.overshootPulse(0.95);
 
     expect(mid, greaterThan(1.0));
     expect(late, greaterThanOrEqualTo(1.0));
     expect(late, lessThan(mid));
-    expect(SpringSurfaceMotion.overshootPulse(1.0), 1.0);
+    expect(ElasticSheetMotion.overshootPulse(1.0), 1.0);
   });
 
   test('natural preset enables sequential cross-axis rebound', () {
-    const config = SpringSurfaceConfig.natural();
+    const config = ElasticSheetConfig.natural();
 
     expect(
       config.reboundProfile,
-      SpringSurfaceReboundProfile.sequentialCrossAxis,
+      ElasticSheetReboundProfile.sequentialCrossAxis,
     );
   });
 
   test('sequentialCrossAxis rebounds vertical before horizontal on expand', () {
-    const config = SpringSurfaceConfig.natural();
-    final earlyVertical = SpringSurfaceMotion.axisReboundScale(
+    const config = ElasticSheetConfig.natural();
+    final earlyVertical = ElasticSheetMotion.axisReboundScale(
       0.67,
-      axis: SpringSurfaceAxis.vertical,
+      axis: ElasticSheetAxis.vertical,
       isCollapsing: false,
       config: config,
     );
-    final earlyHorizontal = SpringSurfaceMotion.axisReboundScale(
+    final earlyHorizontal = ElasticSheetMotion.axisReboundScale(
       0.67,
-      axis: SpringSurfaceAxis.horizontal,
+      axis: ElasticSheetAxis.horizontal,
       isCollapsing: false,
       config: config,
     );
-    final lateVertical = SpringSurfaceMotion.axisReboundScale(
+    final lateVertical = ElasticSheetMotion.axisReboundScale(
       0.86,
-      axis: SpringSurfaceAxis.vertical,
+      axis: ElasticSheetAxis.vertical,
       isCollapsing: false,
       config: config,
     );
-    final lateHorizontal = SpringSurfaceMotion.axisReboundScale(
+    final lateHorizontal = ElasticSheetMotion.axisReboundScale(
       0.86,
-      axis: SpringSurfaceAxis.horizontal,
+      axis: ElasticSheetAxis.horizontal,
       isCollapsing: false,
       config: config,
     );
@@ -111,28 +111,28 @@ void main() {
   });
 
   test('sequentialCrossAxis reverses the rebound order on collapse', () {
-    const config = SpringSurfaceConfig.natural();
-    final earlyHorizontal = SpringSurfaceMotion.axisReboundScale(
+    const config = ElasticSheetConfig.natural();
+    final earlyHorizontal = ElasticSheetMotion.axisReboundScale(
       0.33,
-      axis: SpringSurfaceAxis.horizontal,
+      axis: ElasticSheetAxis.horizontal,
       isCollapsing: true,
       config: config,
     );
-    final earlyVertical = SpringSurfaceMotion.axisReboundScale(
+    final earlyVertical = ElasticSheetMotion.axisReboundScale(
       0.33,
-      axis: SpringSurfaceAxis.vertical,
+      axis: ElasticSheetAxis.vertical,
       isCollapsing: true,
       config: config,
     );
-    final lateHorizontal = SpringSurfaceMotion.axisReboundScale(
+    final lateHorizontal = ElasticSheetMotion.axisReboundScale(
       0.14,
-      axis: SpringSurfaceAxis.horizontal,
+      axis: ElasticSheetAxis.horizontal,
       isCollapsing: true,
       config: config,
     );
-    final lateVertical = SpringSurfaceMotion.axisReboundScale(
+    final lateVertical = ElasticSheetMotion.axisReboundScale(
       0.14,
-      axis: SpringSurfaceAxis.vertical,
+      axis: ElasticSheetAxis.vertical,
       isCollapsing: true,
       config: config,
     );
@@ -148,7 +148,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       _buildHarness(
-        SpringSurface(
+        ElasticSheet(
           isExpanded: true,
           collapsedSize: _collapsedSize,
           expandedSize: _expandedSize,
@@ -168,11 +168,11 @@ void main() {
     (WidgetTester tester) async {
       await tester.pumpWidget(
         _buildHarness(
-          SpringSurface(
+          ElasticSheet(
             isExpanded: true,
             collapsedSize: _collapsedSize,
             expandedSize: _expandedSize,
-            expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
+            expandedSizing: ElasticSheetExpandedSizing.dynamicHeight,
             collapsedChild: const Text('Open'),
             expandedChild: _buildShortExpandedChild(),
           ),
@@ -196,11 +196,11 @@ void main() {
   ) async {
     await tester.pumpWidget(
       _buildHarness(
-        SpringSurface(
+        ElasticSheet(
           isExpanded: true,
           collapsedSize: _collapsedSize,
           expandedSize: _expandedSize,
-          expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
+          expandedSizing: ElasticSheetExpandedSizing.dynamicHeight,
           maxExpandedHeight: 180,
           collapsedChild: const Text('Open'),
           expandedChild: _buildTallExpandedChild(),
@@ -218,11 +218,11 @@ void main() {
   testWidgets('fixed sizing keeps the selected corner pinned while expanding', (
     WidgetTester tester,
   ) async {
-    final anchors = <SpringSurfaceAnchor>[
-      SpringSurfaceAnchor.topLeft,
-      SpringSurfaceAnchor.topRight,
-      SpringSurfaceAnchor.bottomLeft,
-      SpringSurfaceAnchor.bottomRight,
+    final anchors = <ElasticSheetAnchor>[
+      ElasticSheetAnchor.topLeft,
+      ElasticSheetAnchor.topRight,
+      ElasticSheetAnchor.bottomLeft,
+      ElasticSheetAnchor.bottomRight,
     ];
 
     for (final anchor in anchors) {
@@ -253,7 +253,7 @@ void main() {
       _buildHarness(
         _buildSurface(
           isExpanded: false,
-          anchor: SpringSurfaceAnchor.topLeft,
+          anchor: ElasticSheetAnchor.topLeft,
           config: _fastNaturalConfig,
         ),
       ),
@@ -265,7 +265,7 @@ void main() {
       _buildHarness(
         _buildSurface(
           isExpanded: true,
-          anchor: SpringSurfaceAnchor.topLeft,
+          anchor: ElasticSheetAnchor.topLeft,
           config: _fastNaturalConfig,
         ),
       ),
@@ -273,7 +273,7 @@ void main() {
     await tester.pumpAndSettle();
 
     _expectPinnedCorner(
-      SpringSurfaceAnchor.topLeft,
+      ElasticSheetAnchor.topLeft,
       _surfaceRect(tester),
       hostRect,
     );
@@ -282,20 +282,20 @@ void main() {
   testWidgets('legacy origin still controls dynamic vertical alignment', (
     WidgetTester tester,
   ) async {
-    final cases = <SpringSurfaceOrigin, double>{
-      SpringSurfaceOrigin.top: 0,
-      SpringSurfaceOrigin.center: 90,
-      SpringSurfaceOrigin.bottom: 180,
+    final cases = <ElasticSheetOrigin, double>{
+      ElasticSheetOrigin.top: 0,
+      ElasticSheetOrigin.center: 90,
+      ElasticSheetOrigin.bottom: 180,
     };
 
     for (final entry in cases.entries) {
       await tester.pumpWidget(
         _buildHarness(
-          SpringSurface(
+          ElasticSheet(
             isExpanded: true,
             collapsedSize: _collapsedSize,
             expandedSize: _expandedSize,
-            expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
+            expandedSizing: ElasticSheetExpandedSizing.dynamicHeight,
             origin: entry.key,
             collapsedChild: const Text('Open'),
             expandedChild: _buildShortExpandedChild(),
@@ -314,10 +314,10 @@ void main() {
   ) async {
     await tester.pumpWidget(
       _buildHarness(
-        SpringSurface(
+        ElasticSheet(
           isExpanded: true,
-          anchor: SpringSurfaceAnchor.topLeft,
-          origin: SpringSurfaceOrigin.bottom,
+          anchor: ElasticSheetAnchor.topLeft,
+          origin: ElasticSheetOrigin.bottom,
           collapsedSize: _collapsedSize,
           expandedSize: _expandedSize,
           collapsedChild: const Text('Open'),
@@ -336,27 +336,27 @@ void main() {
   testWidgets('dynamicHeight ignores the horizontal anchor component', (
     WidgetTester tester,
   ) async {
-    final cases = <SpringSurfaceAnchor, double>{
-      SpringSurfaceAnchor.topLeft: 0,
-      SpringSurfaceAnchor.topCenter: 0,
-      SpringSurfaceAnchor.topRight: 0,
-      SpringSurfaceAnchor.centerLeft: 90,
-      SpringSurfaceAnchor.center: 90,
-      SpringSurfaceAnchor.centerRight: 90,
-      SpringSurfaceAnchor.bottomLeft: 180,
-      SpringSurfaceAnchor.bottomCenter: 180,
-      SpringSurfaceAnchor.bottomRight: 180,
+    final cases = <ElasticSheetAnchor, double>{
+      ElasticSheetAnchor.topLeft: 0,
+      ElasticSheetAnchor.topCenter: 0,
+      ElasticSheetAnchor.topRight: 0,
+      ElasticSheetAnchor.centerLeft: 90,
+      ElasticSheetAnchor.center: 90,
+      ElasticSheetAnchor.centerRight: 90,
+      ElasticSheetAnchor.bottomLeft: 180,
+      ElasticSheetAnchor.bottomCenter: 180,
+      ElasticSheetAnchor.bottomRight: 180,
     };
 
     for (final entry in cases.entries) {
       await tester.pumpWidget(
         _buildHarness(
-          SpringSurface(
+          ElasticSheet(
             isExpanded: true,
             anchor: entry.key,
             collapsedSize: _collapsedSize,
             expandedSize: _expandedSize,
-            expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
+            expandedSizing: ElasticSheetExpandedSizing.dynamicHeight,
             collapsedChild: const Text('Open'),
             expandedChild: _buildShortExpandedChild(),
           ),
@@ -378,7 +378,7 @@ void main() {
 
     Widget build(bool isExpanded) {
       return _buildHarness(
-        SpringSurface(
+        ElasticSheet(
           isExpanded: isExpanded,
           config: _fastConfig,
           collapsedSize: _collapsedSize,
@@ -405,17 +405,17 @@ void main() {
     expect(collapsedCount, 1);
   });
 
-  testWidgets('SpringSurfaceActions.maybeOf returns null outside scope', (
+  testWidgets('ElasticSheetActions.maybeOf returns null outside scope', (
     WidgetTester tester,
   ) async {
-    SpringSurfaceActions? actions;
+    ElasticSheetActions? actions;
 
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
           body: Builder(
             builder: (context) {
-              actions = SpringSurfaceActions.maybeOf(context);
+              actions = ElasticSheetActions.maybeOf(context);
               return const SizedBox();
             },
           ),
@@ -426,7 +426,7 @@ void main() {
     expect(actions, isNull);
   });
 
-  testWidgets('SpringSurfaceActions.of throws a clear error outside scope', (
+  testWidgets('ElasticSheetActions.of throws a clear error outside scope', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
@@ -434,7 +434,7 @@ void main() {
         home: Scaffold(
           body: Builder(
             builder: (context) {
-              SpringSurfaceActions.of(context);
+              ElasticSheetActions.of(context);
               return const SizedBox();
             },
           ),
@@ -444,7 +444,7 @@ void main() {
 
     final exception = tester.takeException();
     expect(exception, isA<FlutterError>());
-    expect(exception.toString(), contains('SpringSurface.controlled'));
+    expect(exception.toString(), contains('ElasticSheet.controlled'));
   });
 
   testWidgets('controlled descendants can expand, collapse, and toggle', (
@@ -490,9 +490,9 @@ void main() {
   ) async {
     await tester.pumpWidget(
       _buildHarness(
-        SpringSurface(
+        ElasticSheet(
           isExpanded: false,
-          contentState: SpringSurfaceContentState.ready,
+          contentState: ElasticSheetContentState.ready,
           collapsedSize: _collapsedSize,
           collapsedChild: const Text('Open'),
         ),
@@ -509,9 +509,9 @@ void main() {
 
     await tester.pumpWidget(
       _buildHarness(
-        SpringSurface(
+        ElasticSheet(
           isExpanded: false,
-          contentState: SpringSurfaceContentState.pending,
+          contentState: ElasticSheetContentState.pending,
           config: _fastConfig,
           collapsedSize: _collapsedSize,
           collapsedChild: const Text('Pending'),
@@ -542,9 +542,9 @@ void main() {
 
     await tester.pumpWidget(
       _buildHarness(
-        SpringSurface(
+        ElasticSheet(
           isExpanded: false,
-          contentState: SpringSurfaceContentState.unavailable,
+          contentState: ElasticSheetContentState.unavailable,
           config: _fastConfig,
           collapsedSize: _collapsedSize,
           collapsedChild: const Text('Unavailable'),
@@ -563,7 +563,7 @@ void main() {
   testWidgets('controller pulse returns to a collapsed resting state', (
     WidgetTester tester,
   ) async {
-    late SpringSurfaceController controller;
+    late ElasticSheetController controller;
 
     await tester.pumpWidget(
       _ControlledPulseHarness(onControllerReady: (value) => controller = value),
@@ -612,7 +612,7 @@ void main() {
 class _ControlledPulseHarness extends StatefulWidget {
   const _ControlledPulseHarness({required this.onControllerReady});
 
-  final ValueChanged<SpringSurfaceController> onControllerReady;
+  final ValueChanged<ElasticSheetController> onControllerReady;
 
   @override
   State<_ControlledPulseHarness> createState() =>
@@ -621,12 +621,12 @@ class _ControlledPulseHarness extends StatefulWidget {
 
 class _ControlledPulseHarnessState extends State<_ControlledPulseHarness>
     with SingleTickerProviderStateMixin {
-  late final SpringSurfaceController _controller;
+  late final ElasticSheetController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = SpringSurfaceController(vsync: this, config: _fastConfig);
+    _controller = ElasticSheetController(vsync: this, config: _fastConfig);
     widget.onControllerReady(_controller);
   }
 
@@ -639,9 +639,9 @@ class _ControlledPulseHarnessState extends State<_ControlledPulseHarness>
   @override
   Widget build(BuildContext context) {
     return _buildHarness(
-      SpringSurface.controlled(
+      ElasticSheet.controlled(
         controller: _controller,
-        contentState: SpringSurfaceContentState.pending,
+        contentState: ElasticSheetContentState.pending,
         collapsedSize: _collapsedSize,
         collapsedChild: const Text('Pulse'),
       ),
@@ -659,12 +659,12 @@ class _ControlledActionsHarness extends StatefulWidget {
 
 class _ControlledActionsHarnessState extends State<_ControlledActionsHarness>
     with SingleTickerProviderStateMixin {
-  late final SpringSurfaceController _controller;
+  late final ElasticSheetController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = SpringSurfaceController(vsync: this, config: _fastConfig);
+    _controller = ElasticSheetController(vsync: this, config: _fastConfig);
   }
 
   @override
@@ -676,7 +676,7 @@ class _ControlledActionsHarnessState extends State<_ControlledActionsHarness>
   @override
   Widget build(BuildContext context) {
     return _buildHarness(
-      SpringSurface.controlled(
+      ElasticSheet.controlled(
         controller: _controller,
         collapsedSize: _actionCollapsedSize,
         expandedSize: _actionExpandedSize,
@@ -685,7 +685,7 @@ class _ControlledActionsHarnessState extends State<_ControlledActionsHarness>
             return Center(
               child: TextButton(
                 key: const Key('actions_expand'),
-                onPressed: () => SpringSurfaceActions.of(context).expand(),
+                onPressed: () => ElasticSheetActions.of(context).expand(),
                 child: const Text('Expand'),
               ),
             );
@@ -693,7 +693,7 @@ class _ControlledActionsHarnessState extends State<_ControlledActionsHarness>
         ),
         expandedChild: Builder(
           builder: (context) {
-            final actions = SpringSurfaceActions.of(context);
+            final actions = ElasticSheetActions.of(context);
 
             return Padding(
               padding: const EdgeInsets.all(16),
@@ -734,12 +734,12 @@ class _ControlledPulseActionsHarness extends StatefulWidget {
 class _ControlledPulseActionsHarnessState
     extends State<_ControlledPulseActionsHarness>
     with SingleTickerProviderStateMixin {
-  late final SpringSurfaceController _controller;
+  late final ElasticSheetController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = SpringSurfaceController(vsync: this, config: _fastConfig);
+    _controller = ElasticSheetController(vsync: this, config: _fastConfig);
   }
 
   @override
@@ -751,16 +751,16 @@ class _ControlledPulseActionsHarnessState
   @override
   Widget build(BuildContext context) {
     return _buildHarness(
-      SpringSurface.controlled(
+      ElasticSheet.controlled(
         controller: _controller,
-        contentState: SpringSurfaceContentState.pending,
+        contentState: ElasticSheetContentState.pending,
         collapsedSize: _actionCollapsedSize,
         collapsedChild: Builder(
           builder: (context) {
             return Center(
               child: TextButton(
                 key: const Key('actions_pulse'),
-                onPressed: () => SpringSurfaceActions.of(context).pulse(),
+                onPressed: () => ElasticSheetActions.of(context).pulse(),
                 child: const Text('Pulse'),
               ),
             );
@@ -788,13 +788,13 @@ Widget _buildHarness(Widget child, {Size hostSize = const Size(300, 300)}) {
   );
 }
 
-SpringSurface _buildSurface({
+ElasticSheet _buildSurface({
   required bool isExpanded,
-  SpringSurfaceAnchor? anchor,
-  SpringSurfaceOrigin origin = SpringSurfaceOrigin.bottom,
-  SpringSurfaceConfig config = const SpringSurfaceConfig(),
+  ElasticSheetAnchor? anchor,
+  ElasticSheetOrigin origin = ElasticSheetOrigin.bottom,
+  ElasticSheetConfig config = const ElasticSheetConfig(),
 }) {
-  return SpringSurface(
+  return ElasticSheet(
     isExpanded: isExpanded,
     anchor: anchor,
     origin: origin,
@@ -829,32 +829,32 @@ Widget _buildTallExpandedChild() {
 }
 
 void _expectPinnedCorner(
-  SpringSurfaceAnchor anchor,
+  ElasticSheetAnchor anchor,
   Rect surfaceRect,
   Rect hostRect,
 ) {
   switch (anchor) {
-    case SpringSurfaceAnchor.topLeft:
+    case ElasticSheetAnchor.topLeft:
       expect(surfaceRect.left, closeTo(hostRect.left, 0.01));
       expect(surfaceRect.top, closeTo(hostRect.top, 0.01));
       return;
-    case SpringSurfaceAnchor.topRight:
+    case ElasticSheetAnchor.topRight:
       expect(surfaceRect.right, closeTo(hostRect.right, 0.01));
       expect(surfaceRect.top, closeTo(hostRect.top, 0.01));
       return;
-    case SpringSurfaceAnchor.bottomLeft:
+    case ElasticSheetAnchor.bottomLeft:
       expect(surfaceRect.left, closeTo(hostRect.left, 0.01));
       expect(surfaceRect.bottom, closeTo(hostRect.bottom, 0.01));
       return;
-    case SpringSurfaceAnchor.bottomRight:
+    case ElasticSheetAnchor.bottomRight:
       expect(surfaceRect.right, closeTo(hostRect.right, 0.01));
       expect(surfaceRect.bottom, closeTo(hostRect.bottom, 0.01));
       return;
-    case SpringSurfaceAnchor.topCenter:
-    case SpringSurfaceAnchor.centerLeft:
-    case SpringSurfaceAnchor.center:
-    case SpringSurfaceAnchor.centerRight:
-    case SpringSurfaceAnchor.bottomCenter:
+    case ElasticSheetAnchor.topCenter:
+    case ElasticSheetAnchor.centerLeft:
+    case ElasticSheetAnchor.center:
+    case ElasticSheetAnchor.centerRight:
+    case ElasticSheetAnchor.bottomCenter:
       throw ArgumentError.value(anchor, 'anchor', 'Expected a corner anchor.');
   }
 }

@@ -11,14 +11,14 @@ import 'elastic_sheet_motion.dart';
 
 /// Legacy vertical-only anchor for expansion.
 ///
-/// Prefer [SpringSurfaceAnchor] for new code.
-enum SpringSurfaceOrigin { center, bottom, top }
+/// Prefer [ElasticSheetAnchor] for new code.
+enum ElasticSheetOrigin { center, bottom, top }
 
 /// A 9-point anchor for fixed-size expansion.
 ///
 /// For `dynamicHeight`, the horizontal component is collapsed to the center
 /// column so the surface keeps the current vertical-only behavior.
-enum SpringSurfaceAnchor {
+enum ElasticSheetAnchor {
   topLeft,
   topCenter,
   topRight,
@@ -31,16 +31,16 @@ enum SpringSurfaceAnchor {
 }
 
 /// Controls how the expanded surface height is resolved.
-enum SpringSurfaceExpandedSizing {
-  /// Use the explicit [SpringSurface.expandedSize] height.
+enum ElasticSheetExpandedSizing {
+  /// Use the explicit [ElasticSheet.expandedSize] height.
   fixed,
 
-  /// Measure [SpringSurface.expandedChild] and expand to its height.
+  /// Measure [ElasticSheet.expandedChild] and expand to its height.
   dynamicHeight,
 }
 
 /// Describes whether the surface currently has expandable content.
-enum SpringSurfaceContentState {
+enum ElasticSheetContentState {
   /// The surface has expanded content and can open normally.
   ready,
 
@@ -55,12 +55,12 @@ enum SpringSurfaceContentState {
 ///
 /// Declarative usage:
 /// ```dart
-/// SpringSurface(
+/// ElasticSheet(
 ///   isExpanded: _open,
-///   anchor: SpringSurfaceAnchor.bottomCenter,
+///   anchor: ElasticSheetAnchor.bottomCenter,
 ///   collapsedSize: const Size(200, 52),
 ///   expandedSize: const Size(360, 480),
-///   expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
+///   expandedSizing: ElasticSheetExpandedSizing.dynamicHeight,
 ///   collapsedChild: const Text('Open'),
 ///   expandedChild: MySheet(),
 /// )
@@ -68,9 +68,9 @@ enum SpringSurfaceContentState {
 ///
 /// Pending usage:
 /// ```dart
-/// SpringSurface(
+/// ElasticSheet(
 ///   isExpanded: false,
-///   contentState: SpringSurfaceContentState.pending,
+///   contentState: ElasticSheetContentState.pending,
 ///   collapsedSize: const Size(200, 52),
 ///   collapsedChild: const Text('Waiting for data'),
 ///   onPendingTap: _refreshData,
@@ -79,23 +79,23 @@ enum SpringSurfaceContentState {
 ///
 /// Controller usage:
 /// ```dart
-/// SpringSurface.controlled(
+/// ElasticSheet.controlled(
 ///   controller: _ctrl,
-///   anchor: SpringSurfaceAnchor.center,
+///   anchor: ElasticSheetAnchor.center,
 ///   collapsedSize: const Size(200, 52),
 ///   expandedSize: const Size(360, 480),
-///   expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
+///   expandedSizing: ElasticSheetExpandedSizing.dynamicHeight,
 ///   collapsedChild: Builder(
 ///     builder: (context) => IconButton(
-///       onPressed: () => SpringSurfaceActions.of(context).expand(),
+///       onPressed: () => ElasticSheetActions.of(context).expand(),
 ///       icon: const Icon(Icons.add_rounded),
 ///     ),
 ///   ),
 ///   expandedChild: MySheet(),
 /// )
 /// ```
-class SpringSurface extends StatefulWidget {
-  const SpringSurface({
+class ElasticSheet extends StatefulWidget {
+  const ElasticSheet({
     super.key,
     required this.isExpanded,
     required this.collapsedSize,
@@ -103,10 +103,10 @@ class SpringSurface extends StatefulWidget {
     required this.collapsedChild,
     this.expandedChild,
     this.anchor,
-    this.origin = SpringSurfaceOrigin.bottom,
-    this.config = const SpringSurfaceConfig(),
-    this.contentState = SpringSurfaceContentState.ready,
-    this.expandedSizing = SpringSurfaceExpandedSizing.fixed,
+    this.origin = ElasticSheetOrigin.bottom,
+    this.config = const ElasticSheetConfig(),
+    this.contentState = ElasticSheetContentState.ready,
+    this.expandedSizing = ElasticSheetExpandedSizing.fixed,
     this.maxExpandedHeight,
     this.collapsedDecoration,
     this.expandedDecoration,
@@ -117,17 +117,17 @@ class SpringSurface extends StatefulWidget {
     this.onPendingTap,
   }) : controller = null;
 
-  const SpringSurface.controlled({
+  const ElasticSheet.controlled({
     super.key,
-    required SpringSurfaceController this.controller,
+    required ElasticSheetController this.controller,
     required this.collapsedSize,
     this.expandedSize,
     required this.collapsedChild,
     this.expandedChild,
     this.anchor,
-    this.origin = SpringSurfaceOrigin.bottom,
-    this.contentState = SpringSurfaceContentState.ready,
-    this.expandedSizing = SpringSurfaceExpandedSizing.fixed,
+    this.origin = ElasticSheetOrigin.bottom,
+    this.contentState = ElasticSheetContentState.ready,
+    this.expandedSizing = ElasticSheetExpandedSizing.fixed,
     this.maxExpandedHeight,
     this.collapsedDecoration,
     this.expandedDecoration,
@@ -137,23 +137,23 @@ class SpringSurface extends StatefulWidget {
     this.onCollapsed,
     this.onPendingTap,
   }) : isExpanded = null,
-       config = const SpringSurfaceConfig();
+       config = const ElasticSheetConfig();
 
   final bool? isExpanded;
-  final SpringSurfaceController? controller;
-  final SpringSurfaceConfig config;
+  final ElasticSheetController? controller;
+  final ElasticSheetConfig config;
 
   /// Preferred 9-point growth anchor.
-  final SpringSurfaceAnchor? anchor;
+  final ElasticSheetAnchor? anchor;
 
   /// Legacy vertical-only expansion shortcut.
   ///
   /// When both [anchor] and [origin] are provided, [anchor] wins.
-  final SpringSurfaceOrigin origin;
+  final ElasticSheetOrigin origin;
 
   /// Whether the surface currently has expandable data.
-  final SpringSurfaceContentState contentState;
-  final SpringSurfaceExpandedSizing expandedSizing;
+  final ElasticSheetContentState contentState;
+  final ElasticSheetExpandedSizing expandedSizing;
   final double? maxExpandedHeight;
 
   final Size collapsedSize;
@@ -169,38 +169,38 @@ class SpringSurface extends StatefulWidget {
   final VoidCallback? onPendingTap;
 
   @override
-  State<SpringSurface> createState() => _SpringSurfaceState();
+  State<ElasticSheet> createState() => _ElasticSheetState();
 }
 
-class _SpringSurfaceState extends State<SpringSurface>
+class _ElasticSheetState extends State<ElasticSheet>
     with SingleTickerProviderStateMixin {
   static const double _defaultMaxExpandedHeightFactor = 0.8;
   static const double _sizeChangeEpsilon = 0.5;
 
   late AnimationController _rawController;
-  SpringSurfaceController? _ownedController;
+  ElasticSheetController? _ownedController;
   bool _lastIsExpanded = false;
   double? _measuredExpandedChildHeight;
 
-  SpringSurfaceController get _effectiveController =>
+  ElasticSheetController get _effectiveController =>
       widget.controller ?? _ownedController!;
 
-  SpringSurfaceConfig get _config => widget.controller?.config ?? widget.config;
-  SpringSurfaceContentState get _contentState => widget.contentState;
-  bool get _isReady => _contentState == SpringSurfaceContentState.ready;
-  bool get _isPending => _contentState == SpringSurfaceContentState.pending;
+  ElasticSheetConfig get _config => widget.controller?.config ?? widget.config;
+  ElasticSheetContentState get _contentState => widget.contentState;
+  bool get _isReady => _contentState == ElasticSheetContentState.ready;
+  bool get _isPending => _contentState == ElasticSheetContentState.pending;
   bool get _isUnavailable =>
-      _contentState == SpringSurfaceContentState.unavailable;
+      _contentState == ElasticSheetContentState.unavailable;
   bool get _isPulsing => _effectiveController.isPulsing;
 
   bool get _usesDynamicExpandedHeight =>
       _isReady &&
-      widget.expandedSizing == SpringSurfaceExpandedSizing.dynamicHeight;
+      widget.expandedSizing == ElasticSheetExpandedSizing.dynamicHeight;
 
-  SpringSurfaceAnchor get _configuredAnchor =>
+  ElasticSheetAnchor get _configuredAnchor =>
       widget.anchor ?? _anchorFromOrigin(widget.origin);
 
-  SpringSurfaceAnchor get _resolvedAnchor => _usesDynamicExpandedHeight
+  ElasticSheetAnchor get _resolvedAnchor => _usesDynamicExpandedHeight
       ? _normalizeAnchorForDynamicHeight(_configuredAnchor)
       : _configuredAnchor;
 
@@ -224,7 +224,7 @@ class _SpringSurfaceState extends State<SpringSurface>
     if (widget.controller != null) {
       _rawController = widget.controller!.rawController;
     } else {
-      _ownedController = SpringSurfaceController(
+      _ownedController = ElasticSheetController(
         vsync: this,
         config: widget.config,
       );
@@ -239,7 +239,7 @@ class _SpringSurfaceState extends State<SpringSurface>
   }
 
   @override
-  void didUpdateWidget(covariant SpringSurface oldWidget) {
+  void didUpdateWidget(covariant ElasticSheet oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.contentState != oldWidget.contentState ||
@@ -342,16 +342,16 @@ class _SpringSurfaceState extends State<SpringSurface>
       constraints,
     );
 
-    final wProgress = SpringSurfaceMotion.axisProgress(
+    final wProgress = ElasticSheetMotion.axisProgress(
       t,
       isCollapsing: isCollapsing,
-      axis: SpringSurfaceAxis.horizontal,
+      axis: ElasticSheetAxis.horizontal,
       config: cfg,
     );
-    final hProgress = SpringSurfaceMotion.axisProgress(
+    final hProgress = ElasticSheetMotion.axisProgress(
       t,
       isCollapsing: isCollapsing,
-      axis: SpringSurfaceAxis.vertical,
+      axis: ElasticSheetAxis.vertical,
       config: cfg,
     );
 
@@ -367,22 +367,22 @@ class _SpringSurfaceState extends State<SpringSurface>
     )!;
     final currentW =
         baseW *
-        SpringSurfaceMotion.axisReboundScale(
+        ElasticSheetMotion.axisReboundScale(
           t,
-          axis: SpringSurfaceAxis.horizontal,
+          axis: ElasticSheetAxis.horizontal,
           isCollapsing: isCollapsing,
           config: cfg,
         );
     final currentH =
         baseH *
-        SpringSurfaceMotion.axisReboundScale(
+        ElasticSheetMotion.axisReboundScale(
           t,
-          axis: SpringSurfaceAxis.vertical,
+          axis: ElasticSheetAxis.vertical,
           isCollapsing: isCollapsing,
           config: cfg,
         );
 
-    final rProgress = SpringSurfaceMotion.radiusProgress(
+    final rProgress = ElasticSheetMotion.radiusProgress(
       t,
       isCollapsing: isCollapsing,
     );
@@ -401,7 +401,7 @@ class _SpringSurfaceState extends State<SpringSurface>
       color: theme.colorScheme.surface,
       borderRadius: currentRadius,
     );
-    final surfP = SpringSurfaceMotion.surfaceProgress(
+    final surfP = ElasticSheetMotion.surfaceProgress(
       t,
       isCollapsing: isCollapsing,
     );
@@ -417,20 +417,20 @@ class _SpringSurfaceState extends State<SpringSurface>
 
     final collapsedOpacity =
         1.0 -
-        SpringSurfaceMotion.segment(
+        ElasticSheetMotion.segment(
           t,
           begin: 0.05,
           end: 0.28,
           curve: Curves.easeOutCubic,
         );
     final expandedOpacity = isCollapsing
-        ? SpringSurfaceMotion.segment(
+        ? ElasticSheetMotion.segment(
             t,
             begin: 0.68,
             end: 0.95,
             curve: Curves.easeOutCubic,
           )
-        : SpringSurfaceMotion.segment(
+        : ElasticSheetMotion.segment(
             t,
             begin: 0.48,
             end: 0.84,
@@ -626,7 +626,7 @@ class _SpringSurfaceState extends State<SpringSurface>
     if (controller == null) {
       return child;
     }
-    return SpringSurfaceActions(controller: controller, child: child);
+    return ElasticSheetActions(controller: controller, child: child);
   }
 
   void _handleExpandedChildMeasuredSize(Size size) {
@@ -687,55 +687,55 @@ class _SpringSurfaceState extends State<SpringSurface>
         _effectiveMaxExpandedHeight(context, constraints) + _sizeChangeEpsilon;
   }
 
-  SpringSurfaceAnchor _anchorFromOrigin(SpringSurfaceOrigin origin) {
+  ElasticSheetAnchor _anchorFromOrigin(ElasticSheetOrigin origin) {
     switch (origin) {
-      case SpringSurfaceOrigin.top:
-        return SpringSurfaceAnchor.topCenter;
-      case SpringSurfaceOrigin.center:
-        return SpringSurfaceAnchor.center;
-      case SpringSurfaceOrigin.bottom:
-        return SpringSurfaceAnchor.bottomCenter;
+      case ElasticSheetOrigin.top:
+        return ElasticSheetAnchor.topCenter;
+      case ElasticSheetOrigin.center:
+        return ElasticSheetAnchor.center;
+      case ElasticSheetOrigin.bottom:
+        return ElasticSheetAnchor.bottomCenter;
     }
   }
 
-  SpringSurfaceAnchor _normalizeAnchorForDynamicHeight(
-    SpringSurfaceAnchor anchor,
+  ElasticSheetAnchor _normalizeAnchorForDynamicHeight(
+    ElasticSheetAnchor anchor,
   ) {
     switch (anchor) {
-      case SpringSurfaceAnchor.topLeft:
-      case SpringSurfaceAnchor.topCenter:
-      case SpringSurfaceAnchor.topRight:
-        return SpringSurfaceAnchor.topCenter;
-      case SpringSurfaceAnchor.centerLeft:
-      case SpringSurfaceAnchor.center:
-      case SpringSurfaceAnchor.centerRight:
-        return SpringSurfaceAnchor.center;
-      case SpringSurfaceAnchor.bottomLeft:
-      case SpringSurfaceAnchor.bottomCenter:
-      case SpringSurfaceAnchor.bottomRight:
-        return SpringSurfaceAnchor.bottomCenter;
+      case ElasticSheetAnchor.topLeft:
+      case ElasticSheetAnchor.topCenter:
+      case ElasticSheetAnchor.topRight:
+        return ElasticSheetAnchor.topCenter;
+      case ElasticSheetAnchor.centerLeft:
+      case ElasticSheetAnchor.center:
+      case ElasticSheetAnchor.centerRight:
+        return ElasticSheetAnchor.center;
+      case ElasticSheetAnchor.bottomLeft:
+      case ElasticSheetAnchor.bottomCenter:
+      case ElasticSheetAnchor.bottomRight:
+        return ElasticSheetAnchor.bottomCenter;
     }
   }
 
-  Alignment _alignmentForAnchor(SpringSurfaceAnchor anchor) {
+  Alignment _alignmentForAnchor(ElasticSheetAnchor anchor) {
     switch (anchor) {
-      case SpringSurfaceAnchor.topLeft:
+      case ElasticSheetAnchor.topLeft:
         return Alignment.topLeft;
-      case SpringSurfaceAnchor.topCenter:
+      case ElasticSheetAnchor.topCenter:
         return Alignment.topCenter;
-      case SpringSurfaceAnchor.topRight:
+      case ElasticSheetAnchor.topRight:
         return Alignment.topRight;
-      case SpringSurfaceAnchor.centerLeft:
+      case ElasticSheetAnchor.centerLeft:
         return Alignment.centerLeft;
-      case SpringSurfaceAnchor.center:
+      case ElasticSheetAnchor.center:
         return Alignment.center;
-      case SpringSurfaceAnchor.centerRight:
+      case ElasticSheetAnchor.centerRight:
         return Alignment.centerRight;
-      case SpringSurfaceAnchor.bottomLeft:
+      case ElasticSheetAnchor.bottomLeft:
         return Alignment.bottomLeft;
-      case SpringSurfaceAnchor.bottomCenter:
+      case ElasticSheetAnchor.bottomCenter:
         return Alignment.bottomCenter;
-      case SpringSurfaceAnchor.bottomRight:
+      case ElasticSheetAnchor.bottomRight:
         return Alignment.bottomRight;
     }
   }

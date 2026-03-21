@@ -36,8 +36,8 @@ class PlaygroundControlsPanel extends StatelessWidget {
   final double overshootClamp;
   final int expandDurationMs;
   final int collapseDurationMs;
-  final SpringSurfaceReboundProfile reboundProfile;
-  final SpringSurfaceAnchor anchor;
+  final ElasticSheetReboundProfile reboundProfile;
+  final ElasticSheetAnchor anchor;
   final PlaygroundPlacement placement;
   final ValueChanged<double> onCollapsedWidth;
   final ValueChanged<double> onCollapsedHeight;
@@ -46,10 +46,10 @@ class PlaygroundControlsPanel extends StatelessWidget {
   final ValueChanged<double> onExpandedHeight;
   final ValueChanged<int> onExpandDuration;
   final ValueChanged<int> onCollapseDuration;
-  final ValueChanged<SpringSurfaceReboundProfile> onReboundProfile;
-  final ValueChanged<SpringSurfaceAnchor> onAnchor;
+  final ValueChanged<ElasticSheetReboundProfile> onReboundProfile;
+  final ValueChanged<ElasticSheetAnchor> onAnchor;
   final ValueChanged<PlaygroundPlacement> onPlacement;
-  final ValueChanged<SpringSurfaceConfig> onPreset;
+  final ValueChanged<ElasticSheetConfig> onPreset;
 
   @override
   Widget build(BuildContext context) {
@@ -79,29 +79,29 @@ class PlaygroundControlsPanel extends StatelessWidget {
               children: [
                 PlaygroundPresetChip(
                   label: 'gentle',
-                  onTap: () => onPreset(const SpringSurfaceConfig.gentle()),
+                  onTap: () => onPreset(const ElasticSheetConfig.gentle()),
                 ),
                 PlaygroundPresetChip(
                   label: 'default',
-                  onTap: () => onPreset(const SpringSurfaceConfig()),
+                  onTap: () => onPreset(const ElasticSheetConfig()),
                 ),
                 PlaygroundPresetChip(
                   label: 'bouncy',
-                  onTap: () => onPreset(const SpringSurfaceConfig.bouncy()),
+                  onTap: () => onPreset(const ElasticSheetConfig.bouncy()),
                 ),
                 PlaygroundPresetChip(
                   key: const Key('playground_preset_natural'),
                   label: 'natural',
-                  onTap: () => onPreset(const SpringSurfaceConfig.natural()),
+                  onTap: () => onPreset(const ElasticSheetConfig.natural()),
                 ),
                 PlaygroundPresetChip(
                   label: 'snappy',
-                  onTap: () => onPreset(const SpringSurfaceConfig.snappy()),
+                  onTap: () => onPreset(const ElasticSheetConfig.snappy()),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            const PlaygroundSectionLabel(title: 'Controls from SpringSurface'),
+            const PlaygroundSectionLabel(title: 'Controls from ElasticSheet'),
             PlaygroundSliderRow(
               label: 'overshoot',
               value: overshootClamp,
@@ -169,14 +169,14 @@ class PlaygroundControlsPanel extends StatelessWidget {
                 PlaygroundReboundProfileChip(
                   key: const Key('playground_rebound_simultaneous'),
                   label: 'simultaneous',
-                  value: SpringSurfaceReboundProfile.simultaneous,
+                  value: ElasticSheetReboundProfile.simultaneous,
                   current: reboundProfile,
                   onTap: onReboundProfile,
                 ),
                 PlaygroundReboundProfileChip(
                   key: const Key('playground_rebound_sequential'),
                   label: 'sequential',
-                  value: SpringSurfaceReboundProfile.sequentialCrossAxis,
+                  value: ElasticSheetReboundProfile.sequentialCrossAxis,
                   current: reboundProfile,
                   onTap: onReboundProfile,
                 ),
@@ -394,9 +394,9 @@ class PlaygroundReboundProfileChip extends StatelessWidget {
   });
 
   final String label;
-  final SpringSurfaceReboundProfile value;
-  final SpringSurfaceReboundProfile current;
-  final ValueChanged<SpringSurfaceReboundProfile> onTap;
+  final ElasticSheetReboundProfile value;
+  final ElasticSheetReboundProfile current;
+  final ValueChanged<ElasticSheetReboundProfile> onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -470,9 +470,9 @@ class PlaygroundAnchorChip extends StatelessWidget {
   });
 
   final String label;
-  final SpringSurfaceAnchor value;
-  final SpringSurfaceAnchor current;
-  final ValueChanged<SpringSurfaceAnchor> onTap;
+  final ElasticSheetAnchor value;
+  final ElasticSheetAnchor current;
+  final ValueChanged<ElasticSheetAnchor> onTap;
 
   @override
   Widget build(BuildContext context) {

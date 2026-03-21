@@ -2,44 +2,44 @@ import 'package:elastic_sheet/elastic_sheet.dart';
 
 enum PlaygroundPlacement { top, center, bottom }
 
-const List<List<SpringSurfaceAnchor>> playgroundAnchorGrid = [
+const List<List<ElasticSheetAnchor>> playgroundAnchorGrid = [
   [
-    SpringSurfaceAnchor.topLeft,
-    SpringSurfaceAnchor.topCenter,
-    SpringSurfaceAnchor.topRight,
+    ElasticSheetAnchor.topLeft,
+    ElasticSheetAnchor.topCenter,
+    ElasticSheetAnchor.topRight,
   ],
   [
-    SpringSurfaceAnchor.centerLeft,
-    SpringSurfaceAnchor.center,
-    SpringSurfaceAnchor.centerRight,
+    ElasticSheetAnchor.centerLeft,
+    ElasticSheetAnchor.center,
+    ElasticSheetAnchor.centerRight,
   ],
   [
-    SpringSurfaceAnchor.bottomLeft,
-    SpringSurfaceAnchor.bottomCenter,
-    SpringSurfaceAnchor.bottomRight,
+    ElasticSheetAnchor.bottomLeft,
+    ElasticSheetAnchor.bottomCenter,
+    ElasticSheetAnchor.bottomRight,
   ],
 ];
 
-const String playgroundCollapsedLabelText = 'بيانات الطلب';
-const String playgroundExpandedHeadingText = 'معلومات الحساب';
-const String playgroundConfirmPaymentText = 'تأكيد الدفع';
+const String playgroundCollapsedLabelText = 'Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø·Ù„Ø¨';
+const String playgroundExpandedHeadingText = 'Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø­Ø³Ø§Ø¨';
+const String playgroundConfirmPaymentText = 'ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø¯ÙØ¹';
 const String playgroundOvershootDescriptionText =
-    'يحدد مقدار السماح بتجاوز الحجم المستهدف أثناء الحركة. رفعه يزيد الارتداد والامتلاء البصري.';
+    'ÙŠØ­Ø¯Ø¯ Ù…Ù‚Ø¯Ø§Ø± Ø§Ù„Ø³Ù…Ø§Ø­ Ø¨ØªØ¬Ø§ÙˆØ² Ø§Ù„Ø­Ø¬Ù… Ø§Ù„Ù…Ø³ØªÙ‡Ø¯Ù Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø­Ø±ÙƒØ©. Ø±ÙØ¹Ù‡ ÙŠØ²ÙŠØ¯ Ø§Ù„Ø§Ø±ØªØ¯Ø§Ø¯ ÙˆØ§Ù„Ø§Ù…ØªÙ„Ø§Ø¡ Ø§Ù„Ø¨ØµØ±ÙŠ.';
 const String playgroundExpandedWidthDescriptionText =
-    'يحدد العرض النهائي للقطعة عندما تكون في الحالة المتمددة.';
+    'ÙŠØ­Ø¯Ø¯ Ø§Ù„Ø¹Ø±Ø¶ Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ Ù„Ù„Ù‚Ø·Ø¹Ø© Ø¹Ù†Ø¯Ù…Ø§ ØªÙƒÙˆÙ† ÙÙŠ Ø§Ù„Ø­Ø§Ù„Ø© Ø§Ù„Ù…ØªÙ…Ø¯Ø¯Ø©.';
 const String playgroundExpandedHeightDescriptionText =
-    'يحدد الارتفاع النهائي للقطعة عندما تكون في الحالة المتمددة.';
+    'ÙŠØ­Ø¯Ø¯ Ø§Ù„Ø§Ø±ØªÙØ§Ø¹ Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ Ù„Ù„Ù‚Ø·Ø¹Ø© Ø¹Ù†Ø¯Ù…Ø§ ØªÙƒÙˆÙ† ÙÙŠ Ø§Ù„Ø­Ø§Ù„Ø© Ø§Ù„Ù…ØªÙ…Ø¯Ø¯Ø©.';
 const String playgroundExpandDescriptionText =
-    'مدة فتح القطعة بالملي ثانية. القيم الأكبر تعطي فتحاً أبطأ وأكثر هدوءاً.';
+    'Ù…Ø¯Ø© ÙØªØ­ Ø§Ù„Ù‚Ø·Ø¹Ø© Ø¨Ø§Ù„Ù…Ù„ÙŠ Ø«Ø§Ù†ÙŠØ©. Ø§Ù„Ù‚ÙŠÙ… Ø§Ù„Ø£ÙƒØ¨Ø± ØªØ¹Ø·ÙŠ ÙØªØ­Ø§Ù‹ Ø£Ø¨Ø·Ø£ ÙˆØ£ÙƒØ«Ø± Ù‡Ø¯ÙˆØ¡Ø§Ù‹.';
 const String playgroundCollapseDescriptionText =
-    'مدة إغلاق القطعة بالملي ثانية. القيم الأكبر تعطي إغلاقاً أبطأ وأكثر سلاسة.';
+    'Ù…Ø¯Ø© Ø¥ØºÙ„Ø§Ù‚ Ø§Ù„Ù‚Ø·Ø¹Ø© Ø¨Ø§Ù„Ù…Ù„ÙŠ Ø«Ø§Ù†ÙŠØ©. Ø§Ù„Ù‚ÙŠÙ… Ø§Ù„Ø£ÙƒØ¨Ø± ØªØ¹Ø·ÙŠ Ø¥ØºÙ„Ø§Ù‚Ø§Ù‹ Ø£Ø¨Ø·Ø£ ÙˆØ£ÙƒØ«Ø± Ø³Ù„Ø§Ø³Ø©.';
 const String playgroundButtonWidthDescriptionText =
-    'يتحكم في عرض الزر الأساسي قبل التمدد داخل صفحة المثال.';
+    'ÙŠØªØ­ÙƒÙ… ÙÙŠ Ø¹Ø±Ø¶ Ø§Ù„Ø²Ø± Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ Ù‚Ø¨Ù„ Ø§Ù„ØªÙ…Ø¯Ø¯ Ø¯Ø§Ø®Ù„ ØµÙØ­Ø© Ø§Ù„Ù…Ø«Ø§Ù„.';
 const String playgroundButtonHeightDescriptionText =
-    'يتحكم في ارتفاع الزر الأساسي قبل التمدد داخل صفحة المثال.';
+    'ÙŠØªØ­ÙƒÙ… ÙÙŠ Ø§Ø±ØªÙØ§Ø¹ Ø§Ù„Ø²Ø± Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ Ù‚Ø¨Ù„ Ø§Ù„ØªÙ…Ø¯Ø¯ Ø¯Ø§Ø®Ù„ ØµÙØ­Ø© Ø§Ù„Ù…Ø«Ø§Ù„.';
 const String playgroundPlacementDescriptionText =
-    'يحدد موضع القطعة داخل مساحة العرض في المثال: أعلى أو وسط أو أسفل.';
-const String playgroundCloseDialogText = 'إغلاق';
+    'ÙŠØ­Ø¯Ø¯ Ù…ÙˆØ¶Ø¹ Ø§Ù„Ù‚Ø·Ø¹Ø© Ø¯Ø§Ø®Ù„ Ù…Ø³Ø§Ø­Ø© Ø§Ù„Ø¹Ø±Ø¶ ÙÙŠ Ø§Ù„Ù…Ø«Ø§Ù„: Ø£Ø¹Ù„Ù‰ Ø£Ùˆ ÙˆØ³Ø· Ø£Ùˆ Ø£Ø³ÙÙ„.';
+const String playgroundCloseDialogText = 'Ø¥ØºÙ„Ø§Ù‚';
 const String playgroundReboundDescriptionText =
     'Choose how the late rebound travels across the surface. Sequential cross-axis transfers tension vertically first on open, then horizontally, and reverses the order on collapse.';
 const String playgroundAnchorDescriptionText =
@@ -47,25 +47,25 @@ const String playgroundAnchorDescriptionText =
 const String playgroundAnchorFootnoteText =
     'Combined corner anchors matter in fixed sizing. Dynamic height keeps only the vertical row.';
 
-String playgroundAnchorLabel(SpringSurfaceAnchor anchor) {
+String playgroundAnchorLabel(ElasticSheetAnchor anchor) {
   switch (anchor) {
-    case SpringSurfaceAnchor.topLeft:
+    case ElasticSheetAnchor.topLeft:
       return 'TL';
-    case SpringSurfaceAnchor.topCenter:
+    case ElasticSheetAnchor.topCenter:
       return 'T';
-    case SpringSurfaceAnchor.topRight:
+    case ElasticSheetAnchor.topRight:
       return 'TR';
-    case SpringSurfaceAnchor.centerLeft:
+    case ElasticSheetAnchor.centerLeft:
       return 'L';
-    case SpringSurfaceAnchor.center:
+    case ElasticSheetAnchor.center:
       return 'C';
-    case SpringSurfaceAnchor.centerRight:
+    case ElasticSheetAnchor.centerRight:
       return 'R';
-    case SpringSurfaceAnchor.bottomLeft:
+    case ElasticSheetAnchor.bottomLeft:
       return 'BL';
-    case SpringSurfaceAnchor.bottomCenter:
+    case ElasticSheetAnchor.bottomCenter:
       return 'B';
-    case SpringSurfaceAnchor.bottomRight:
+    case ElasticSheetAnchor.bottomRight:
       return 'BR';
   }
 }

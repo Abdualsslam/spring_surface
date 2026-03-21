@@ -1,26 +1,26 @@
 // elastic_sheet - elastic expand/collapse widget for Flutter.
 //
 // Usage (Widget-only):
-// SpringSurface(
+// ElasticSheet(
 //   isExpanded: _isExpanded,
-//   anchor: SpringSurfaceAnchor.bottomLeft,
-//   config: SpringSurfaceConfig.gentle(),
+//   anchor: ElasticSheetAnchor.bottomLeft,
+//   config: ElasticSheetConfig.gentle(),
 //   collapsedChild: MyButton(),
 //   expandedChild: MySheet(),
 // )
 //
 // Pending usage:
-// SpringSurface(
+// ElasticSheet(
 //   isExpanded: false,
-//   contentState: SpringSurfaceContentState.pending,
+//   contentState: ElasticSheetContentState.pending,
 //   collapsedSize: const Size(200, 48),
 //   collapsedChild: const Text('Waiting for data'),
 // )
 //
 // Usage (Controller):
-// final controller = SpringSurfaceController(
+// final controller = ElasticSheetController(
 //   vsync: this,
-//   config: SpringSurfaceConfig(stiffness: 220, damping: 18),
+//   config: ElasticSheetConfig(stiffness: 220, damping: 18),
 // );
 // controller.expand();
 // controller.collapse();

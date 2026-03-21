@@ -29,16 +29,16 @@ class UnifiedShowcaseLocaleSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     const accent = Color(0xFF1F2937);
 
-    return SpringSurface(
+    return ElasticSheet(
       key: const ValueKey('unified_showcase_locale_surface'),
       isExpanded: isExpanded,
       anchor: isArabic
-          ? SpringSurfaceAnchor.topLeft
-          : SpringSurfaceAnchor.topRight,
-      expandedSizing: SpringSurfaceExpandedSizing.fixed,
+          ? ElasticSheetAnchor.topLeft
+          : ElasticSheetAnchor.topRight,
+      expandedSizing: ElasticSheetExpandedSizing.fixed,
       collapsedSize: const Size(58, 44),
       expandedSize: Size(expandedWidth, 208),
-      config: const SpringSurfaceConfig.gentle(),
+      config: const ElasticSheetConfig.gentle(),
       collapsedDecoration: collapsedSurfaceDecoration(accent),
       expandedDecoration: expandedSurfaceDecoration(accent),
       collapsedChild: GestureDetector(

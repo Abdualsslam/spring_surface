@@ -138,20 +138,20 @@ class UnifiedShowcaseScheduleSection extends StatelessWidget {
                         start: 0,
                         width: expandedWidth,
                         height: 232,
-                        child: SpringSurface(
+                        child: ElasticSheet(
                           key: const ValueKey(
                             'unified_showcase_middle_day_surface',
                           ),
                           isExpanded: dayExpanded,
                           anchor: isArabic
-                              ? SpringSurfaceAnchor.topRight
-                              : SpringSurfaceAnchor.topLeft,
+                              ? ElasticSheetAnchor.topRight
+                              : ElasticSheetAnchor.topLeft,
                           expandedSizing:
-                              SpringSurfaceExpandedSizing.dynamicHeight,
+                              ElasticSheetExpandedSizing.dynamicHeight,
                           maxExpandedHeight: 216,
                           collapsedSize: Size(dayWidth, 64),
                           expandedSize: Size(expandedWidth, 204),
-                          config: const SpringSurfaceConfig.gentle(),
+                          config: const ElasticSheetConfig.gentle(),
                           collapsedDecoration: calendarSurfaceDecoration(
                             dayAccent,
                             const Color(0xFFFFF0DD),

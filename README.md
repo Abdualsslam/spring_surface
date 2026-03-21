@@ -1,4 +1,4 @@
-# elastic_sheet
+﻿# elastic_sheet
 
 `elastic_sheet` is a Flutter widget for building realistic expand/collapse surfaces with a liquid spring feel.
 
@@ -7,8 +7,8 @@ It is designed for inline actions, drawers, search affordances, composer bars, a
 ## Features
 
 - Declarative API with `isExpanded`
-- Controller-based API with `SpringSurfaceController`
-- Configurable spring tuning via `SpringSurfaceConfig`
+- Controller-based API with `ElasticSheetController`
+- Configurable spring tuning via `ElasticSheetConfig`
 - Optional rebound profiles, including a sequential cross-axis stretch
 - 9-point anchors for fixed-size expansion, from `topLeft` to `bottomRight`
 - Content states for `ready`, `pending`, and `unavailable`
@@ -43,13 +43,13 @@ class _DemoCardState extends State<DemoCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => setState(() => _isExpanded = !_isExpanded),
-      child: SpringSurface(
+      child: ElasticSheet(
         isExpanded: _isExpanded,
-        anchor: SpringSurfaceAnchor.bottomCenter,
-        config: const SpringSurfaceConfig.gentle(),
+        anchor: ElasticSheetAnchor.bottomCenter,
+        config: const ElasticSheetConfig.gentle(),
         collapsedSize: const Size(220, 52),
         expandedSize: const Size(320, 320),
-        expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
+        expandedSizing: ElasticSheetExpandedSizing.dynamicHeight,
         collapsedChild: const Center(child: Text('Open')),
         expandedChild: const Padding(
           padding: EdgeInsets.all(16),
@@ -64,14 +64,14 @@ class _DemoCardState extends State<DemoCard> {
 ## Controller API
 
 ```dart
-late final SpringSurfaceController controller;
+late final ElasticSheetController controller;
 
 @override
 void initState() {
   super.initState();
-  controller = SpringSurfaceController(
+  controller = ElasticSheetController(
     vsync: this,
-    config: const SpringSurfaceConfig.snappy(),
+    config: const ElasticSheetConfig.snappy(),
   );
 }
 
@@ -85,9 +85,9 @@ void dispose() {
 Then use:
 
 ```dart
-SpringSurface.controlled(
+ElasticSheet.controlled(
   controller: controller,
-  anchor: SpringSurfaceAnchor.centerRight,
+  anchor: ElasticSheetAnchor.centerRight,
   collapsedSize: const Size(220, 52),
   expandedSize: const Size(320, 320),
   collapsedChild: const Text('Compose'),
@@ -98,19 +98,19 @@ SpringSurface.controlled(
 You can also opt into a more natural late-stage rebound:
 
 ```dart
-const config = SpringSurfaceConfig.natural();
+const config = ElasticSheetConfig.natural();
 ```
 
 ## Partial Triggers
 
-`SpringSurface.controlled` injects `SpringSurfaceActions` around its collapsed
+`ElasticSheet.controlled` injects `ElasticSheetActions` around its collapsed
 and expanded content. That lets any descendant open, close, toggle, or pulse
 the surface without turning the whole `collapsedChild` into one large button.
 
 ```dart
-SpringSurface.controlled(
+ElasticSheet.controlled(
   controller: controller,
-  anchor: SpringSurfaceAnchor.bottomCenter,
+  anchor: ElasticSheetAnchor.bottomCenter,
   collapsedSize: const Size(320, 56),
   expandedSize: const Size(320, 220),
   collapsedChild: Builder(
@@ -120,7 +120,7 @@ SpringSurface.controlled(
         IconButton(
           onPressed: () {
             FocusManager.instance.primaryFocus?.unfocus();
-            SpringSurfaceActions.of(context).expand();
+            ElasticSheetActions.of(context).expand();
           },
           icon: const Icon(Icons.add_rounded),
         ),
@@ -136,9 +136,9 @@ SpringSurface.controlled(
 Use `anchor` to keep a specific edge or corner fixed while the surface grows:
 
 ```dart
-SpringSurface(
+ElasticSheet(
   isExpanded: _open,
-  anchor: SpringSurfaceAnchor.topRight,
+  anchor: ElasticSheetAnchor.topRight,
   collapsedSize: const Size(180, 48),
   expandedSize: const Size(320, 280),
   collapsedChild: const Text('Filters'),
@@ -146,7 +146,7 @@ SpringSurface(
 )
 ```
 
-For `SpringSurfaceExpandedSizing.dynamicHeight`, the horizontal part of the
+For `ElasticSheetExpandedSizing.dynamicHeight`, the horizontal part of the
 anchor is ignored so `topLeft` and `topRight` both behave like `topCenter`,
 and the same applies to the `center` and `bottom` rows.
 
@@ -155,9 +155,9 @@ and the same applies to the `center` and `bottom` rows.
 Use `contentState` when a collapsed surface does not always have expanded data.
 
 ```dart
-SpringSurface(
+ElasticSheet(
   isExpanded: false,
-  contentState: SpringSurfaceContentState.pending,
+  contentState: ElasticSheetContentState.pending,
   collapsedSize: const Size(180, 48),
   collapsedChild: const Text('Waiting for slot data'),
   onPendingTap: _reloadSlots,
@@ -171,3 +171,4 @@ SpringSurface(
 ## Example app
 
 The runnable showcase lives in [`example/`](example). It contains the playground plus several realistic scenarios that import the package exactly as an external consumer would.
+

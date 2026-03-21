@@ -19,8 +19,8 @@ class PlaygroundSurfacePreview extends StatelessWidget {
   });
 
   final bool isExpanded;
-  final SpringSurfaceAnchor anchor;
-  final SpringSurfaceConfig config;
+  final ElasticSheetAnchor anchor;
+  final ElasticSheetConfig config;
   final Size collapsedSize;
   final Size expandedSize;
   final double surfaceHostWidth;
@@ -47,7 +47,7 @@ class PlaygroundSurfacePreview extends StatelessWidget {
               key: const Key('playground_surface_host'),
               width: surfaceHostWidth,
               height: surfaceHostHeight,
-              child: SpringSurface(
+              child: ElasticSheet(
                 isExpanded: isExpanded,
                 anchor: anchor,
                 config: config,

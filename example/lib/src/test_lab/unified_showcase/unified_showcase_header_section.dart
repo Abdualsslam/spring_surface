@@ -135,17 +135,17 @@ class UnifiedShowcaseHeaderSection extends StatelessWidget {
                   start: pad,
                   width: searchWidth,
                   height: 226,
-                  child: SpringSurface(
+                  child: ElasticSheet(
                     key: const ValueKey('unified_showcase_top_search_surface'),
                     isExpanded: searchExpanded,
                     anchor: isArabic
-                        ? SpringSurfaceAnchor.topRight
-                        : SpringSurfaceAnchor.topLeft,
-                    expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
+                        ? ElasticSheetAnchor.topRight
+                        : ElasticSheetAnchor.topLeft,
+                    expandedSizing: ElasticSheetExpandedSizing.dynamicHeight,
                     maxExpandedHeight: 212,
                     collapsedSize: Size(searchWidth, 48),
                     expandedSize: Size(searchWidth, 190),
-                    config: const SpringSurfaceConfig(),
+                    config: const ElasticSheetConfig(),
                     collapsedDecoration: collapsedSurfaceDecoration(
                       searchAccent,
                     ),
@@ -225,16 +225,16 @@ class UnifiedShowcaseHeaderSection extends StatelessWidget {
                   end: pad,
                   width: filterExpandedWidth,
                   height: 236,
-                  child: SpringSurface(
+                  child: ElasticSheet(
                     key: const ValueKey('unified_showcase_top_filter_surface'),
                     isExpanded: filterExpanded,
                     anchor: isArabic
-                        ? SpringSurfaceAnchor.topLeft
-                        : SpringSurfaceAnchor.topRight,
-                    expandedSizing: SpringSurfaceExpandedSizing.fixed,
+                        ? ElasticSheetAnchor.topLeft
+                        : ElasticSheetAnchor.topRight,
+                    expandedSizing: ElasticSheetExpandedSizing.fixed,
                     collapsedSize: Size(filterWidth, 44),
                     expandedSize: Size(filterExpandedWidth, 204),
-                    config: const SpringSurfaceConfig.gentle(),
+                    config: const ElasticSheetConfig.gentle(),
                     collapsedDecoration: collapsedSurfaceDecoration(
                       filterAccent,
                     ),

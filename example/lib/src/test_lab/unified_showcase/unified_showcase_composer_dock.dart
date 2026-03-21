@@ -15,7 +15,7 @@ class UnifiedShowcaseComposerDock extends StatelessWidget {
     required this.onExpand,
   });
 
-  final SpringSurfaceController controller;
+  final ElasticSheetController controller;
   final TextEditingController draftController;
   final FocusNode draftFocusNode;
   final UnifiedShowcaseStrings strings;
@@ -31,10 +31,10 @@ class UnifiedShowcaseComposerDock extends StatelessWidget {
         builder: (context, constraints) {
           final dockWidth = constraints.maxWidth.clamp(260.0, 360.0).toDouble();
 
-          return SpringSurface.controlled(
+          return ElasticSheet.controlled(
             controller: controller,
-            anchor: SpringSurfaceAnchor.bottomCenter,
-            expandedSizing: SpringSurfaceExpandedSizing.dynamicHeight,
+            anchor: ElasticSheetAnchor.bottomCenter,
+            expandedSizing: ElasticSheetExpandedSizing.dynamicHeight,
             maxExpandedHeight: 214,
             collapsedSize: Size(dockWidth, 58),
             expandedSize: Size(dockWidth, 188),

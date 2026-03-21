@@ -2,19 +2,19 @@ import 'package:flutter/widgets.dart';
 
 import 'elastic_sheet_controller.dart';
 
-/// Exposes [SpringSurfaceController] actions to descendants.
+/// Exposes [ElasticSheetController] actions to descendants.
 ///
-/// This scope is injected automatically by [SpringSurface.controlled], so any
+/// This scope is injected automatically by [ElasticSheet.controlled], so any
 /// descendant inside the collapsed or expanded content can open, close, toggle,
 /// or pulse the surface without wiring those callbacks through the widget tree.
-class SpringSurfaceActions extends InheritedNotifier<SpringSurfaceController> {
-  const SpringSurfaceActions({
+class ElasticSheetActions extends InheritedNotifier<ElasticSheetController> {
+  const ElasticSheetActions({
     super.key,
-    required SpringSurfaceController controller,
+    required ElasticSheetController controller,
     required super.child,
   }) : super(notifier: controller);
 
-  SpringSurfaceController get controller => notifier!;
+  ElasticSheetController get controller => notifier!;
 
   bool get isExpanded => controller.isExpanded;
   bool get isAnimating => controller.isAnimating;
@@ -25,27 +25,25 @@ class SpringSurfaceActions extends InheritedNotifier<SpringSurfaceController> {
   Future<void> toggle() => controller.toggle();
   Future<void> pulse() => controller.pulse();
 
-  static SpringSurfaceActions of(BuildContext context) {
+  static ElasticSheetActions of(BuildContext context) {
     final actions = maybeOf(context);
     if (actions != null) {
       return actions;
     }
 
     throw FlutterError.fromParts([
-      ErrorSummary(
-        'SpringSurfaceActions.of() called with no scope in context.',
-      ),
+      ErrorSummary('ElasticSheetActions.of() called with no scope in context.'),
       ErrorDescription(
-        'SpringSurfaceActions are only available below SpringSurface.controlled.',
+        'ElasticSheetActions are only available below ElasticSheet.controlled.',
       ),
       ErrorHint(
-        'Wrap the interactive content inside SpringSurface.controlled, then call '
-        'SpringSurfaceActions.of(context) from a descendant widget or Builder.',
+        'Wrap the interactive content inside ElasticSheet.controlled, then call '
+        'ElasticSheetActions.of(context) from a descendant widget or Builder.',
       ),
     ]);
   }
 
-  static SpringSurfaceActions? maybeOf(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<SpringSurfaceActions>();
+  static ElasticSheetActions? maybeOf(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<ElasticSheetActions>();
   }
 }

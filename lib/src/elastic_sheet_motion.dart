@@ -4,10 +4,10 @@ import 'package:flutter/animation.dart';
 
 import 'elastic_sheet_config.dart';
 
-enum SpringSurfaceAxis { horizontal, vertical }
+enum ElasticSheetAxis { horizontal, vertical }
 
-class SpringSurfaceMotion {
-  const SpringSurfaceMotion._();
+class ElasticSheetMotion {
+  const ElasticSheetMotion._();
 
   static double overshootAmplitudeForClamp(double overshootClamp) {
     if (overshootClamp <= 1.0) {
@@ -19,10 +19,10 @@ class SpringSurfaceMotion {
   static double axisProgress(
     double progress, {
     required bool isCollapsing,
-    required SpringSurfaceAxis axis,
-    required SpringSurfaceConfig config,
+    required ElasticSheetAxis axis,
+    required ElasticSheetConfig config,
   }) {
-    final isHorizontal = axis == SpringSurfaceAxis.horizontal;
+    final isHorizontal = axis == ElasticSheetAxis.horizontal;
 
     final base = isCollapsing
         ? segment(
@@ -99,11 +99,11 @@ class SpringSurfaceMotion {
 
   static double axisReboundScale(
     double progress, {
-    required SpringSurfaceAxis axis,
+    required ElasticSheetAxis axis,
     required bool isCollapsing,
-    required SpringSurfaceConfig config,
+    required ElasticSheetConfig config,
   }) {
-    if (config.reboundProfile == SpringSurfaceReboundProfile.simultaneous) {
+    if (config.reboundProfile == ElasticSheetReboundProfile.simultaneous) {
       if (isCollapsing) {
         return 1.0;
       }
@@ -113,7 +113,7 @@ class SpringSurfaceMotion {
         amplitude: overshootAmplitudeForClamp(config.overshootClamp),
       );
 
-      if (axis == SpringSurfaceAxis.horizontal) {
+      if (axis == ElasticSheetAxis.horizontal) {
         return 1.0 + (pulse - 1.0) * 0.45;
       }
 
@@ -122,8 +122,8 @@ class SpringSurfaceMotion {
 
     final motionProgress = isCollapsing ? 1.0 - progress : progress;
     final primaryAxis = isCollapsing
-        ? SpringSurfaceAxis.horizontal
-        : SpringSurfaceAxis.vertical;
+        ? ElasticSheetAxis.horizontal
+        : ElasticSheetAxis.vertical;
     final firstPhase = segment(
       motionProgress,
       begin: 0.56,
@@ -242,7 +242,7 @@ class SpringSurfaceMotion {
     double progress, {
     required bool isHorizontal,
     required bool isCollapsing,
-    required SpringSurfaceConfig config,
+    required ElasticSheetConfig config,
   }) {
     if (progress <= 0 || progress >= 1) {
       return 0.0;
@@ -268,10 +268,10 @@ class SpringSurfaceMotion {
   }
 
   static double _anticipationAmplitude({
-    required SpringSurfaceAxis axis,
-    required SpringSurfaceConfig config,
+    required ElasticSheetAxis axis,
+    required ElasticSheetConfig config,
   }) {
-    if (axis == SpringSurfaceAxis.horizontal) {
+    if (axis == ElasticSheetAxis.horizontal) {
       return math.min(config.horizontalStretchAmplitude * 0.45, 0.016);
     }
     return math.min(config.verticalStretchAmplitude * 0.28, 0.02);
@@ -297,22 +297,22 @@ class SpringSurfaceMotion {
   }
 
   static double _activeReboundAmplitude({
-    required SpringSurfaceAxis axis,
-    required SpringSurfaceConfig config,
+    required ElasticSheetAxis axis,
+    required ElasticSheetConfig config,
   }) {
     final overshoot = overshootAmplitudeForClamp(config.overshootClamp);
-    if (axis == SpringSurfaceAxis.horizontal) {
+    if (axis == ElasticSheetAxis.horizontal) {
       return math.min(overshoot * 0.34, 0.045);
     }
     return math.min(overshoot * 0.60, 0.072);
   }
 
   static double _counterCompressionAmplitude({
-    required SpringSurfaceAxis axis,
-    required SpringSurfaceConfig config,
+    required ElasticSheetAxis axis,
+    required ElasticSheetConfig config,
   }) {
     final activeAmplitude = _activeReboundAmplitude(axis: axis, config: config);
-    if (axis == SpringSurfaceAxis.horizontal) {
+    if (axis == ElasticSheetAxis.horizontal) {
       return math.min(activeAmplitude * 0.30, 0.014);
     }
     return math.min(activeAmplitude * 0.26, 0.018);

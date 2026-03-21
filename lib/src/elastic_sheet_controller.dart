@@ -5,18 +5,18 @@ import 'package:flutter/foundation.dart';
 
 import 'elastic_sheet_config.dart';
 
-/// Controller-based API for [SpringSurface].
+/// Controller-based API for [ElasticSheet].
 ///
 /// Mount it in a [State] that mixes in [TickerProviderStateMixin], then pass
-/// it to [SpringSurface.controller]. Dispose it in [State.dispose].
+/// it to [ElasticSheet.controlled]. Dispose it in [State.dispose].
 ///
 /// ```dart
-/// late final SpringSurfaceController _controller;
+/// late final ElasticSheetController _controller;
 ///
 /// @override
 /// void initState() {
 ///   super.initState();
-///   _controller = SpringSurfaceController(vsync: this);
+///   _controller = ElasticSheetController(vsync: this);
 /// }
 ///
 /// @override
@@ -25,10 +25,10 @@ import 'elastic_sheet_config.dart';
 ///   super.dispose();
 /// }
 /// ```
-class SpringSurfaceController extends ChangeNotifier {
-  SpringSurfaceController({
+class ElasticSheetController extends ChangeNotifier {
+  ElasticSheetController({
     required TickerProvider vsync,
-    SpringSurfaceConfig config = const SpringSurfaceConfig(),
+    ElasticSheetConfig config = const ElasticSheetConfig(),
   }) : _config = config,
        _animationController = AnimationController(
          vsync: vsync,
@@ -38,14 +38,14 @@ class SpringSurfaceController extends ChangeNotifier {
     _animationController.addListener(notifyListeners);
   }
 
-  SpringSurfaceConfig _config;
+  ElasticSheetConfig _config;
   final AnimationController _animationController;
   bool _isPulsing = false;
 
   /// The current config. Changing this live re-configures the animation
   /// durations immediately.
-  SpringSurfaceConfig get config => _config;
-  set config(SpringSurfaceConfig value) {
+  ElasticSheetConfig get config => _config;
+  set config(ElasticSheetConfig value) {
     if (_config == value) {
       return;
     }
@@ -67,7 +67,7 @@ class SpringSurfaceController extends ChangeNotifier {
   /// Whether an animation is currently running.
   bool get isAnimating => _animationController.isAnimating;
 
-  /// The underlying [AnimationController] - exposed only for [SpringSurface]
+  /// The underlying [AnimationController] - exposed only for [ElasticSheet]
   /// to wire up its [AnimatedBuilder].
   AnimationController get rawController => _animationController;
 

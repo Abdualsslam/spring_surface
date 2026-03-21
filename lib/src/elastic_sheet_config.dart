@@ -1,5 +1,5 @@
 /// Controls how the late-stage rebound is distributed across axes.
-enum SpringSurfaceReboundProfile {
+enum ElasticSheetReboundProfile {
   /// Keep the existing simultaneous rebound behavior.
   simultaneous,
 
@@ -11,13 +11,13 @@ enum SpringSurfaceReboundProfile {
 ///
 /// Use the named constructors for sensible presets, or fine-tune
 /// every value yourself.
-class SpringSurfaceConfig {
+class ElasticSheetConfig {
   /// Controls how fast the spring pulls toward the target.
-  /// Higher = snappier.  Range: 50–500.  Default: 220.
+  /// Higher = snappier.  Range: 50â€“500.  Default: 220.
   final double stiffness;
 
   /// Controls how quickly oscillation dies out.
-  /// Lower = more bouncy.  Range: 5–40.  Default: 18.
+  /// Lower = more bouncy.  Range: 5â€“40.  Default: 18.
   final double damping;
 
   /// Virtual mass on the spring.
@@ -43,9 +43,9 @@ class SpringSurfaceConfig {
   final Duration collapseDuration;
 
   /// Shapes how the late rebound is distributed across the two axes.
-  final SpringSurfaceReboundProfile reboundProfile;
+  final ElasticSheetReboundProfile reboundProfile;
 
-  const SpringSurfaceConfig({
+  const ElasticSheetConfig({
     this.stiffness = 220,
     this.damping = 18,
     this.mass = 1.0,
@@ -54,11 +54,11 @@ class SpringSurfaceConfig {
     this.verticalStretchAmplitude = 0.065,
     this.expandDuration = const Duration(milliseconds: 600),
     this.collapseDuration = const Duration(milliseconds: 600),
-    this.reboundProfile = SpringSurfaceReboundProfile.simultaneous,
+    this.reboundProfile = ElasticSheetReboundProfile.simultaneous,
   });
 
-  /// Gentle — subtle overshoot, soft feel.
-  const SpringSurfaceConfig.gentle()
+  /// Gentle â€” subtle overshoot, soft feel.
+  const ElasticSheetConfig.gentle()
     : stiffness = 160,
       damping = 22,
       mass = 1.0,
@@ -67,10 +67,10 @@ class SpringSurfaceConfig {
       verticalStretchAmplitude = 0.040,
       expandDuration = const Duration(milliseconds: 700),
       collapseDuration = const Duration(milliseconds: 600),
-      reboundProfile = SpringSurfaceReboundProfile.simultaneous;
+      reboundProfile = ElasticSheetReboundProfile.simultaneous;
 
-  /// Bouncy — exaggerated overshoot, playful feel.
-  const SpringSurfaceConfig.bouncy()
+  /// Bouncy â€” exaggerated overshoot, playful feel.
+  const ElasticSheetConfig.bouncy()
     : stiffness = 280,
       damping = 12,
       mass = 1.2,
@@ -79,10 +79,10 @@ class SpringSurfaceConfig {
       verticalStretchAmplitude = 0.090,
       expandDuration = const Duration(milliseconds: 550),
       collapseDuration = const Duration(milliseconds: 500),
-      reboundProfile = SpringSurfaceReboundProfile.simultaneous;
+      reboundProfile = ElasticSheetReboundProfile.simultaneous;
 
-  /// Snappy — fast, minimal overshoot, utilitarian.
-  const SpringSurfaceConfig.snappy()
+  /// Snappy â€” fast, minimal overshoot, utilitarian.
+  const ElasticSheetConfig.snappy()
     : stiffness = 380,
       damping = 28,
       mass = 0.8,
@@ -91,10 +91,10 @@ class SpringSurfaceConfig {
       verticalStretchAmplitude = 0.025,
       expandDuration = const Duration(milliseconds: 400),
       collapseDuration = const Duration(milliseconds: 380),
-      reboundProfile = SpringSurfaceReboundProfile.simultaneous;
+      reboundProfile = ElasticSheetReboundProfile.simultaneous;
 
   /// Natural - a softer cross-axis transfer that feels more elastic.
-  const SpringSurfaceConfig.natural()
+  const ElasticSheetConfig.natural()
     : stiffness = 210,
       damping = 20,
       mass = 1.0,
@@ -103,9 +103,9 @@ class SpringSurfaceConfig {
       verticalStretchAmplitude = 0.055,
       expandDuration = const Duration(milliseconds: 640),
       collapseDuration = const Duration(milliseconds: 540),
-      reboundProfile = SpringSurfaceReboundProfile.sequentialCrossAxis;
+      reboundProfile = ElasticSheetReboundProfile.sequentialCrossAxis;
 
-  SpringSurfaceConfig copyWith({
+  ElasticSheetConfig copyWith({
     double? stiffness,
     double? damping,
     double? mass,
@@ -114,9 +114,9 @@ class SpringSurfaceConfig {
     double? verticalStretchAmplitude,
     Duration? expandDuration,
     Duration? collapseDuration,
-    SpringSurfaceReboundProfile? reboundProfile,
+    ElasticSheetReboundProfile? reboundProfile,
   }) {
-    return SpringSurfaceConfig(
+    return ElasticSheetConfig(
       stiffness: stiffness ?? this.stiffness,
       damping: damping ?? this.damping,
       mass: mass ?? this.mass,
@@ -134,7 +134,7 @@ class SpringSurfaceConfig {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SpringSurfaceConfig &&
+      other is ElasticSheetConfig &&
           stiffness == other.stiffness &&
           damping == other.damping &&
           mass == other.mass &&
