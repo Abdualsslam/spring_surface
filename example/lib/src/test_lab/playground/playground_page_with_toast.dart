@@ -24,6 +24,7 @@ class _ElasticSheetPlaygroundState extends State<ElasticSheetPlayground> {
   static const double _defaultVerticalStretch = 0.065;
 
   bool _isDark = false;
+  bool _showToast = true;
   bool _isExpanded = false;
   double _collapsedWidth = _defaultCollapsedWidth;
   double _collapsedHeight = _defaultCollapsedHeight;
@@ -123,7 +124,9 @@ class _ElasticSheetPlaygroundState extends State<ElasticSheetPlayground> {
 
   void _updateAndToast(VoidCallback update, PlaygroundChangedProp prop) {
     setState(update);
-    PlaygroundCodeToast.show(context, config: _config, changedProp: prop, anchor: _anchor);
+    if (_showToast) {
+      PlaygroundCodeToast.show(context, config: _config, changedProp: prop, anchor: _anchor);
+    }
   }
 
   void _applyPreset(ElasticSheetConfig config) {
@@ -138,12 +141,14 @@ class _ElasticSheetPlaygroundState extends State<ElasticSheetPlayground> {
     });
     // Show toast for stiffness when a preset is selected — it's the most
     // representative property.
-    PlaygroundCodeToast.show(
-      context,
-      config: _config,
-      changedProp: PlaygroundChangedProp.stiffness,
-      anchor: _anchor,
-    );
+    if (_showToast) {
+      PlaygroundCodeToast.show(
+        context,
+        config: _config,
+        changedProp: PlaygroundChangedProp.stiffness,
+        anchor: _anchor,
+      );
+    }
   }
 
   // ── build ─────────────────────────────────────────────────────────────────
@@ -171,6 +176,15 @@ class _ElasticSheetPlaygroundState extends State<ElasticSheetPlayground> {
             ),
           ),
           actions: [
+            IconButton(
+              key: const Key('playground_toggle_toast'),
+              tooltip: 'Toggle Code Toast',
+              onPressed: () => setState(() => _showToast = !_showToast),
+              icon: Icon(
+                _showToast ? Icons.code_rounded : Icons.code_off_rounded,
+                color: _isDark ? const Color(0xFFD1D5DB) : const Color(0xFF4B5563),
+              ),
+            ),
             IconButton(
               key: const Key('playground_toggle_theme'),
               tooltip: 'Toggle Theme',
