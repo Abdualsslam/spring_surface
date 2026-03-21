@@ -1,4 +1,4 @@
-import 'package:spring_surface/spring_surface.dart';
+import 'package:elastic_sheet/elastic_sheet.dart';
 
 enum PlaygroundPlacement { top, center, bottom }
 

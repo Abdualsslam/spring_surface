@@ -1,5 +1,5 @@
-name: spring_surface_example
-description: Example app for the spring_surface Flutter package.
+name: elastic_sheet_example
+description: Example app for the elastic_sheet Flutter package.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  spring_surface:
+  elastic_sheet:
     path: ../
 
   # The following adds the Cupertino Icons font to your application.

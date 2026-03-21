@@ -1,9 +1,9 @@
-# spring_surface example
+# elastic_sheet example
 
-This app demonstrates `spring_surface` as a real consumer package.
+This app demonstrates `elastic_sheet` as a real consumer package.
 
 It contains:
 
 - a playground for tuning the surface behavior
-- realistic showcase pages that import `package:spring_surface/spring_surface.dart`
+- realistic showcase pages that import `package:elastic_sheet/elastic_sheet.dart`
 - widget tests for the example flows

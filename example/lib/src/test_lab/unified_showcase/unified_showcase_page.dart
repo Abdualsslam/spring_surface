@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spring_surface/spring_surface.dart';
+import 'package:elastic_sheet/elastic_sheet.dart';
 
 import 'unified_showcase_activity_section.dart';
 import 'unified_showcase_composer_dock.dart';

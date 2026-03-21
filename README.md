@@ -1,6 +1,6 @@
-# spring_surface
+# elastic_sheet
 
-`spring_surface` is a Flutter widget for building realistic expand/collapse surfaces with a liquid spring feel.
+`elastic_sheet` is a Flutter widget for building realistic expand/collapse surfaces with a liquid spring feel.
 
 It is designed for inline actions, drawers, search affordances, composer bars, and other UI pieces that should feel like one surface stretching into another, not a modal abruptly appearing on top.
 
@@ -20,14 +20,14 @@ It is designed for inline actions, drawers, search affordances, composer bars, a
 
 ```yaml
 dependencies:
-  spring_surface: ^0.1.0
+  elastic_sheet: ^0.1.0
 ```
 
 ## Usage
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:spring_surface/spring_surface.dart';
+import 'package:elastic_sheet/elastic_sheet.dart';
 
 class DemoCard extends StatefulWidget {
   const DemoCard({super.key});

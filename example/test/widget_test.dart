@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:spring_surface_example/main.dart';
+import 'package:elastic_sheet_example/main.dart';
 
 void main() {
-  testWidgets('App shows the spring surface playground', (
+  testWidgets('App shows the elastic sheet playground', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const MyApp());
 
     expect(find.byType(MaterialApp), findsOneWidget);
-    expect(find.text('Spring Surface Playground'), findsOneWidget);
+    expect(find.text('Elastic Sheet Playground'), findsOneWidget);
     expect(find.byType(Slider), findsWidgets);
   });
 

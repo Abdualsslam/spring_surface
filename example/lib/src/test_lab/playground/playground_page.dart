@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spring_surface/spring_surface.dart';
+import 'package:elastic_sheet/elastic_sheet.dart';
 
 import '../../spring_surface_unified_showcase_page.dart';
 import 'playground_controls_panel.dart';
@@ -131,7 +131,7 @@ class _SpringSurfacePlaygroundState extends State<SpringSurfacePlayground> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFEDEDF2),
         surfaceTintColor: Colors.transparent,
-        title: const Text('Spring Surface Playground'),
+        title: const Text('Elastic Sheet Playground'),
         actions: [
           IconButton(
             key: const Key('playground_open_unified_showcase'),

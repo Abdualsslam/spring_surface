@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:spring_surface/spring_surface.dart';
+import 'package:elastic_sheet/elastic_sheet.dart';
 
 const Key _hostKey = Key('host');
 const Size _collapsedSize = Size(100, 40);

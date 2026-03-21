@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spring_surface/spring_surface.dart';
+import 'package:elastic_sheet/elastic_sheet.dart';
 
 import 'playground_models.dart';
 

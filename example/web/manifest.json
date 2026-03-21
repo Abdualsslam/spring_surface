@@ -1,11 +1,11 @@
 {
-    "name": "spring_surface_example",
-    "short_name": "spring_surface_example",
+    "name": "elastic_sheet_example",
+    "short_name": "elastic_sheet_example",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Example app for the elastic_sheet Flutter package.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

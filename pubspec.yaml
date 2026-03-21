@@ -1,9 +1,9 @@
-name: spring_surface
-description: Liquid spring expand/collapse surface for Flutter with realistic showcase examples.
+name: elastic_sheet
+description: Elastic expand/collapse surface for Flutter with realistic showcase examples.
 version: 0.1.0
-homepage: https://github.com/Abdualsslam/spring_surface
-repository: https://github.com/Abdualsslam/spring_surface
-issue_tracker: https://github.com/Abdualsslam/spring_surface/issues
+homepage: https://github.com/Abdualsslam/elastic_sheet
+repository: https://github.com/Abdualsslam/elastic_sheet
+issue_tracker: https://github.com/Abdualsslam/elastic_sheet/issues
 
 environment:
   sdk: ^3.10.4
