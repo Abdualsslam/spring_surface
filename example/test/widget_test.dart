@@ -220,22 +220,29 @@ void main() {
     await _openUnifiedShowcase(tester);
 
     expect(find.byKey(const Key('unified_showcase_page')), findsOneWidget);
-    expect(find.byKey(const Key('unified_showcase_top_zone')), findsOneWidget);
-    await _bringUnifiedFinderIntoComfortableView(
-      tester,
-      find.byKey(const Key('unified_showcase_middle_zone')),
-    );
+    expect(find.text('Top Zone'), findsNothing);
+    expect(find.byKey(const Key('unified_showcase_top_zone')), findsNothing);
+    expect(find.byKey(const Key('unified_showcase_middle_zone')), findsNothing);
+    expect(find.byKey(const Key('unified_showcase_bottom_zone')), findsNothing);
     expect(
-      find.byKey(const Key('unified_showcase_middle_zone')),
+      find.byKey(const Key('unified_showcase_top_search_toggle')),
       findsOneWidget,
     );
-    await _bringUnifiedFinderIntoComfortableView(
-      tester,
-      find.byKey(const Key('unified_showcase_bottom_zone')),
+    expect(
+      find.byKey(const Key('unified_showcase_middle_day_toggle')),
+      findsOneWidget,
     );
     expect(
-      find.byKey(const Key('unified_showcase_bottom_zone')),
+      find.byKey(const Key('unified_showcase_bottom_composer_input_field')),
       findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('unified_showcase_middle_availability_toggle')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const Key('unified_showcase_middle_queue_surface')),
+      findsNothing,
     );
     expect(tester.takeException(), isNull);
   });
@@ -260,14 +267,144 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.tap(find.text('Search workspace'));
-    await tester.pumpAndSettle();
+    await _tapBackdropAtSafeSpot(tester, backdrop);
 
     expect(backdrop, findsNothing);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Unified showcase middle day surface expands from the center', (
+  testWidgets('Unified showcase locale switch changes copy and direction', (
+    WidgetTester tester,
+  ) async {
+    await _openUnifiedShowcase(tester);
+
+    await tester.tap(
+      find.byKey(const Key('unified_showcase_locale_toggle')).hitTestable(),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 150));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('unified_showcase_locale_backdrop')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(const Key('unified_showcase_locale_option_ar')).hitTestable(),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('مكتب الرعاية'), findsOneWidget);
+    expect(find.text('ابحث عن مريض أو نتيجة أو رسالة'), findsOneWidget);
+
+    final directionality = tester.widget<Directionality>(
+      find.byKey(const Key('unified_showcase_directionality')),
+    );
+    expect(directionality.textDirection, TextDirection.rtl);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Unified showcase keeps filter collapsed when search closes', (
+    WidgetTester tester,
+  ) async {
+    await _openUnifiedShowcase(tester);
+
+    final searchToggle = find.byKey(
+      const Key('unified_showcase_top_search_toggle'),
+    );
+    await tester.tap(searchToggle);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 150));
+    await tester.pumpAndSettle();
+
+    final searchBackdrop = find.byKey(
+      const Key('unified_showcase_top_search_backdrop'),
+    );
+    final filterBackdrop = find.byKey(
+      const Key('unified_showcase_top_filter_backdrop'),
+    );
+    expect(searchBackdrop, findsOneWidget);
+    expect(filterBackdrop, findsNothing);
+
+    await _tapBackdropAtSafeSpot(tester, searchBackdrop);
+
+    expect(searchBackdrop, findsNothing);
+    expect(filterBackdrop, findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'Unified showcase filter surface does not animate when search closes',
+    (WidgetTester tester) async {
+      await _openUnifiedShowcase(tester);
+
+      final filterSurface = find.byKey(
+        const ValueKey('unified_showcase_top_filter_surface'),
+      );
+      final searchToggle = find.byKey(
+        const Key('unified_showcase_top_search_toggle'),
+      );
+
+      final initialRect = tester.getRect(filterSurface);
+
+      await tester.tap(searchToggle);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 150));
+      await tester.pumpAndSettle();
+
+      _expectRectsClose(tester.getRect(filterSurface), initialRect);
+
+      final searchBackdrop = find.byKey(
+        const Key('unified_showcase_top_search_backdrop'),
+      );
+      await _tapBackdropAtSafeSpot(tester, searchBackdrop);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 80));
+
+      _expectRectsClose(tester.getRect(filterSurface), initialRect);
+
+      await tester.pumpAndSettle();
+      _expectRectsClose(tester.getRect(filterSurface), initialRect);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('Unified showcase top filter updates the working preset', (
+    WidgetTester tester,
+  ) async {
+    await _openUnifiedShowcase(tester);
+
+    final toggle = find.byKey(const Key('unified_showcase_top_filter_toggle'));
+    await tester.tap(toggle.hitTestable());
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 150));
+    await tester.pumpAndSettle();
+
+    final backdrop = find.byKey(
+      const Key('unified_showcase_top_filter_backdrop'),
+    );
+    expect(backdrop, findsOneWidget);
+
+    await tester.tap(
+      find
+          .byKey(const Key('unified_showcase_top_filter_preset_lab_results'))
+          .hitTestable(),
+    );
+    await tester.pumpAndSettle();
+
+    final labelFinder = find.byKey(
+      const Key('unified_showcase_top_filter_label'),
+    );
+    expect(tester.widget<Text>(labelFinder).data, 'Lab results');
+
+    await _tapBackdropAtSafeSpot(tester, backdrop);
+
+    expect(backdrop, findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Unified showcase middle day surface expands from the schedule', (
     WidgetTester tester,
   ) async {
     await _openUnifiedShowcase(tester);
@@ -283,98 +420,11 @@ void main() {
       const Key('unified_showcase_middle_day_backdrop'),
     );
     expect(backdrop, findsOneWidget);
+    expect(find.text('Thursday details'), findsOneWidget);
 
     await _tapBackdropAtSafeSpot(tester, backdrop);
 
     expect(backdrop, findsNothing);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('Unified showcase pending queue cell pulses only', (
-    WidgetTester tester,
-  ) async {
-    await _openUnifiedShowcase(tester);
-
-    final surface = find.byKey(
-      const Key('unified_showcase_middle_queue_surface'),
-    );
-    final clip = find.descendant(of: surface, matching: find.byType(ClipRRect));
-    await _bringUnifiedFinderIntoComfortableView(tester, surface);
-
-    final initialSize = tester.getSize(clip);
-
-    await tester.tapAt(tester.getCenter(clip));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 45));
-
-    expect(tester.getSize(clip).width, closeTo(initialSize.width, 0.01));
-    expect(
-      find.byKey(const Key('unified_showcase_middle_day_backdrop')),
-      findsNothing,
-    );
-    expect(
-      find.byKey(const Key('unified_showcase_middle_availability_backdrop')),
-      findsNothing,
-    );
-
-    await tester.pumpAndSettle();
-
-    expect(tester.getSize(clip).width, closeTo(initialSize.width, 0.01));
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets(
-    'Unified showcase side availability surface opens without overflow',
-    (WidgetTester tester) async {
-      await _openUnifiedShowcase(tester);
-
-      final toggle = find.byKey(
-        const Key('unified_showcase_middle_availability_toggle'),
-      );
-      await _bringUnifiedFinderIntoComfortableView(tester, toggle);
-      await tester.tap(toggle.hitTestable());
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 150));
-      await tester.pumpAndSettle();
-
-      final backdrop = find.byKey(
-        const Key('unified_showcase_middle_availability_backdrop'),
-      );
-      expect(backdrop, findsOneWidget);
-
-      await tester.tap(find.text('Provider availability'));
-      await tester.pumpAndSettle();
-
-      expect(backdrop, findsNothing);
-      expect(tester.takeException(), isNull);
-    },
-  );
-
-  testWidgets('Unified showcase unavailable cell ignores taps', (
-    WidgetTester tester,
-  ) async {
-    await _openUnifiedShowcase(tester);
-
-    final surface = find.byKey(
-      const Key('unified_showcase_middle_unavailable_surface'),
-    );
-    final clip = find.descendant(of: surface, matching: find.byType(ClipRRect));
-    await _bringUnifiedFinderIntoComfortableView(tester, surface);
-
-    final initialSize = tester.getSize(clip);
-
-    await tester.tapAt(tester.getCenter(clip));
-    await tester.pumpAndSettle();
-
-    expect(tester.getSize(clip).width, closeTo(initialSize.width, 0.01));
-    expect(
-      find.byKey(const Key('unified_showcase_middle_day_backdrop')),
-      findsNothing,
-    );
-    expect(
-      find.byKey(const Key('unified_showcase_middle_availability_backdrop')),
-      findsNothing,
-    );
     expect(tester.takeException(), isNull);
   });
 
@@ -383,14 +433,6 @@ void main() {
   ) async {
     await _openUnifiedShowcase(tester);
 
-    await _bringUnifiedFinderIntoComfortableView(
-      tester,
-      find.byKey(const Key('unified_showcase_middle_zone')),
-    );
-    await _bringUnifiedFinderIntoComfortableView(
-      tester,
-      find.byKey(const Key('unified_showcase_bottom_zone')),
-    );
     final inputField = find.byKey(
       const Key('unified_showcase_bottom_composer_input_field'),
     );
@@ -506,4 +548,11 @@ Finder _unifiedShowcasePageScrollable() {
 String _textFieldValue(WidgetTester tester, Finder finder) {
   final field = tester.widget<TextField>(finder);
   return field.controller?.text ?? '';
+}
+
+void _expectRectsClose(Rect actual, Rect expected) {
+  expect(actual.left, closeTo(expected.left, 0.01));
+  expect(actual.top, closeTo(expected.top, 0.01));
+  expect(actual.width, closeTo(expected.width, 0.01));
+  expect(actual.height, closeTo(expected.height, 0.01));
 }

@@ -243,7 +243,6 @@ class _SpringSurfaceState extends State<SpringSurface>
     super.didUpdateWidget(oldWidget);
 
     if (widget.contentState != oldWidget.contentState ||
-        widget.expandedChild != oldWidget.expandedChild ||
         widget.expandedSize != oldWidget.expandedSize ||
         widget.expandedSizing != oldWidget.expandedSizing ||
         widget.maxExpandedHeight != oldWidget.maxExpandedHeight) {
